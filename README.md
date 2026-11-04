@@ -1,5 +1,7 @@
 # 장손이(JANGSONI) 2.0 — 실행 및 후속 제작 안내
 
+**원본 수달 비교안**은 원본 앉은 이미지를 첫 화면에 두고, 원본을 참조해 생성한 [서기·걷기 포즈 시트](assets/mascot/sprites/original-pose-atlas.png)를 둘러보기에 사용합니다. 아래 자산 준비·연결 안내는 기본 `v2` 프로토타입 기준입니다.
+
 기준: 2026-11-04 / 제공 파일: `index.html` / 원본 캐릭터: `assets/mascot/original.png`
 
 ## 1. 실행

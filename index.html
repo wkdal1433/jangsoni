@@ -3603,6 +3603,13 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
 
 
 
+<script id="mascot-preview-config">
+window.JANGSONI_ATLAS = {
+  src: './assets/mascot/sprites/original-pose-atlas.png',
+  stand: [0, 0, 384, 512],
+  walk: [1, 2, 3, 4, 5, 6, 7].map(cell => [(cell % 4) * 384, Math.floor(cell / 4) * 512, 384, 512])
+};
+</script>
 <script id="landing-script">
 /* JANGSONI 2.0 presentation and entry points */
 (()=>{
