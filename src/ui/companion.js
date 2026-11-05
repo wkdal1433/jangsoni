@@ -13,8 +13,8 @@ export function setupCompanion(root, tour, reduce) {
   const chat = setupCompanionChat(button, reduce);
   const art = button.querySelector('.companion-art');
   const closedFrame = button.querySelector('.companion-closed-frame');
-  const example = root.querySelector('.demo-section');
-  const workbench = document.getElementById('analysis-workbench');
+  const welcome = root.querySelector('#landing-welcome');
+  const journey = root.querySelector('#landing-journey');
   const image = new Image();
   let sprite, tileWidth, tileHeight;
   let drag = null;
@@ -84,8 +84,9 @@ export function setupCompanion(root, tour, reduce) {
   function update() {
     if (!sprite) return;
     if (flight && (root.hidden || reduce.matches)) endFlight();
-    const visible = root.hidden || workbench.getBoundingClientRect().top < innerHeight * .7
-      || (!tour.hidden && example.getBoundingClientRect().top < innerHeight * .6);
+    const welcomePassed = welcome.getBoundingClientRect().bottom <= 1;
+    const journeyPassed = tour.hidden || journey.getBoundingClientRect().bottom <= 1;
+    const visible = root.hidden || (welcomePassed && journeyPassed);
     if (!visible && !flight && !button.hidden) {
       chat.close();
       resetInteraction();
