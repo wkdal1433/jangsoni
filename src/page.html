@@ -456,7 +456,7 @@
       </svg>
     </span>
   </button>
-  <section id="companion-chat" class="companion-chat" role="dialog" aria-labelledby="companion-chat-title" hidden>
+  <dialog id="companion-chat" class="companion-chat" aria-labelledby="companion-chat-title" hidden>
     <header class="companion-chat-header">
       <h2 id="companion-chat-title">장손이 도움말</h2>
       <button type="button" class="companion-chat-guide-button" data-chat-guide hidden>사용법</button>
@@ -466,15 +466,14 @@
       <p>도움이 필요하신가요?</p>
       <div class="companion-chat-actions">
         <button type="button" data-chat-close>아니오</button>
-        <button type="button" class="companion-chat-primary" data-chat-yes>예</button>
+        <button type="button" class="companion-chat-primary" data-chat-yes>질문하기</button>
       </div>
     </div>
     <div class="companion-chat-guide" hidden>
       <h3 tabindex="-1"></h3>
       <ol></ol>
       <div class="companion-chat-actions">
-        <button type="button" data-guide-chat>질문하기</button>
-        <button type="button" class="companion-chat-primary" data-chat-close>확인했어요</button>
+        <button type="button" class="companion-chat-primary" data-guide-confirm>확인했어요</button>
       </div>
     </div>
     <div class="companion-chat-conversation" hidden>
@@ -497,7 +496,7 @@
         </div>
       </form>
     </div>
-  </section>
+  </dialog>
 
   <!-- 분쟁조정 탭 데이터: FSS분쟁조정 폴더의 FSS_분쟁조정정보_보험.json을 gzip+base64로 줄여 넣음 -->
   <script>@@FSS_DATA@@</script>

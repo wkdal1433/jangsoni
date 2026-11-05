@@ -1,15 +1,24 @@
+html.companion-guiding { overflow: hidden; scrollbar-gutter: stable; }
+.companion-chat::backdrop { background: rgb(17 28 43 / .58); }
 .companion-chat {
   --chat-inset: 18px;
   --chat-dock-gap: calc(98px + max(18px, env(safe-area-inset-bottom)));
   --chat-bottom: max(var(--chat-dock-gap), calc(var(--chat-viewport-bottom, 0px) + 12px));
   position: fixed;
+  top: auto;
+  left: auto;
   z-index: 17;
   right: max(var(--chat-inset), env(safe-area-inset-right));
   bottom: var(--chat-bottom);
   display: flex;
   flex-direction: column;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+  max-height: none;
+  overflow: visible;
   width: min(360px, calc(100vw - 2 * var(--chat-inset) - env(safe-area-inset-left) - env(safe-area-inset-right)));
-  border: 1px solid #cbddea;
+  border: 1px solid #f0cbb1;
   border-radius: 18px;
   background: #fff;
   color: #202830;
@@ -38,17 +47,17 @@
 .companion-chat button {
   min-height: 40px;
   padding: 6px 12px;
-  border: 1px solid #cbddea;
+  border: 1px solid #f0cbb1;
   border-radius: 9px;
   background: #fff;
-  color: #204e82;
+  color: #b94d11;
   font: inherit;
   font-weight: 700;
   cursor: pointer;
 }
-.companion-chat button:hover { background: #edf5fc; }
+.companion-chat button:hover { background: #fff2e7; }
 .companion-chat :is(button, textarea, [role="log"]):focus-visible {
-  outline: 2px solid #2f6db5;
+  outline: 2px solid #ff7a29;
   outline-offset: 2px;
 }
 .companion-chat .companion-chat-close {
@@ -59,8 +68,8 @@
   font-size: 23px;
   line-height: 1;
 }
-.companion-chat .companion-chat-primary { background: #2864a6; border-color: #2864a6; color: #fff; }
-.companion-chat .companion-chat-primary:hover { background: #204e82; }
+.companion-chat .companion-chat-primary { background: #ff7a29; border-color: #ff7a29; color: #fff; }
+.companion-chat .companion-chat-primary:hover { background: #ea6720; border-color: #ea6720; }
 .companion-chat-invitation { padding: 14px 16px; }
 .companion-chat-invitation::after {
   content: "";
@@ -131,6 +140,13 @@
 }
 .companion-chat-pending span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .companion-chat-pending button { flex-shrink: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .companion-chat[data-guiding]::backdrop { animation: companion-backdrop-enter 260ms ease-out; }
+}
+@keyframes companion-backdrop-enter {
+  from { background: rgb(17 28 43 / 0); }
+  to { background: rgb(17 28 43 / .58); }
+}
 @media (max-width: 720px) {
   .companion-chat { --chat-inset: 10px; --chat-dock-gap: calc(72px + max(18px, env(safe-area-inset-bottom))); }
   .companion-chat-invitation::after { right: 24px; }

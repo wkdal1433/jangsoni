@@ -11,6 +11,7 @@ export function setupCompanionChat(trigger, reduce) {
   const guideTitle = guide.querySelector('h3');
   const guideSteps = guide.querySelector('ol');
   const guideButton = panel.querySelector('[data-chat-guide]');
+  const closeButton = panel.querySelector('.companion-chat-close');
   const log = panel.querySelector('[role="log"]');
   const form = panel.querySelector('form');
   const message = form.querySelector('textarea');
@@ -31,11 +32,21 @@ export function setupCompanionChat(trigger, reduce) {
   function show(view) {
     const wasHidden = panel.hidden;
     const previousHeight = panel.getBoundingClientRect().height;
+    const guiding = view === guide;
+    if (panel.open && panel.hasAttribute('data-guiding') !== guiding) panel.close();
     motion?.cancel();
     invitation.hidden = view !== invitation;
     conversation.hidden = view !== conversation;
     guide.hidden = view !== guide;
+    closeButton.hidden = guiding;
+    guideButton.hidden = guiding || !companionGuides[currentScreen];
+    panel.toggleAttribute('data-guiding', guiding);
+    document.documentElement.classList.toggle('companion-guiding', guiding);
     panel.hidden = false;
+    if (!panel.open) {
+      if (guiding) panel.showModal();
+      else panel.show();
+    }
     trigger.setAttribute('aria-expanded', 'true');
     position();
     if (reduce.matches) return;
@@ -60,7 +71,10 @@ export function setupCompanionChat(trigger, reduce) {
   function close(restoreFocus = false) {
     if (panel.hidden) return;
     motion?.cancel();
+    panel.close();
     panel.hidden = true;
+    panel.removeAttribute('data-guiding');
+    document.documentElement.classList.remove('companion-guiding');
     trigger.setAttribute('aria-expanded', 'false');
     if (restoreFocus && !trigger.hidden) trigger.focus({ preventScroll: true });
   }
@@ -83,8 +97,6 @@ export function setupCompanionChat(trigger, reduce) {
       item.textContent = text;
       return item;
     }));
-    seenGuides.add(currentScreen);
-    try { localStorage.setItem(guideStorageKey, JSON.stringify([...seenGuides])); } catch {}
     show(guide);
     guideTitle.focus({ preventScroll: true });
   }
@@ -139,7 +151,12 @@ export function setupCompanionChat(trigger, reduce) {
   }
 
   yes.addEventListener('click', openConversation);
-  panel.querySelector('[data-guide-chat]').addEventListener('click', openConversation);
+  panel.querySelector('[data-guide-confirm]').addEventListener('click', () => {
+    seenGuides.add(currentScreen);
+    try { localStorage.setItem(guideStorageKey, JSON.stringify([...seenGuides])); } catch {}
+    show(invitation);
+    yes.focus({ preventScroll: true });
+  });
   guideButton.addEventListener('click', showGuide);
   panel.querySelectorAll('[data-chat-close]').forEach(button => {
     button.addEventListener('click', () => close(true));
@@ -171,9 +188,14 @@ export function setupCompanionChat(trigger, reduce) {
 
   panel.addEventListener('keydown', event => {
     if (event.key === 'Escape' && !event.isComposing) {
+      event.preventDefault();
       event.stopPropagation();
-      close(true);
+      if (guide.hidden) close(true);
     }
+  });
+  panel.addEventListener('cancel', event => {
+    event.preventDefault();
+    if (guide.hidden) close(true);
   });
   panel.addEventListener('wheel', event => event.stopPropagation(), { passive: true });
   document.addEventListener('pointerdown', event => {
