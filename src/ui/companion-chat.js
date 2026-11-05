@@ -150,12 +150,21 @@ export function setupCompanionChat(trigger, reduce) {
     log.append(bubble);
   }
 
-  yes.addEventListener('click', openConversation);
-  panel.querySelector('[data-guide-confirm]').addEventListener('click', () => {
+  function confirmGuide() {
     seenGuides.add(currentScreen);
     try { localStorage.setItem(guideStorageKey, JSON.stringify([...seenGuides])); } catch {}
     show(invitation);
     yes.focus({ preventScroll: true });
+  }
+
+  yes.addEventListener('click', openConversation);
+  panel.querySelector('[data-guide-confirm]').addEventListener('click', confirmGuide);
+  panel.addEventListener('click', event => {
+    if (guide.hidden || event.target !== panel) return;
+    const bounds = panel.getBoundingClientRect();
+    const outside = event.clientX < bounds.left || event.clientX > bounds.right
+      || event.clientY < bounds.top || event.clientY > bounds.bottom;
+    if (outside) confirmGuide();
   });
   guideButton.addEventListener('click', showGuide);
   panel.querySelectorAll('[data-chat-close]').forEach(button => {
