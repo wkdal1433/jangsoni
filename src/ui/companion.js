@@ -1,13 +1,16 @@
 import companionSource from '../../assets/mascot/runtime/companion.webp';
 import { mountAtlas } from './sprite.js';
 import { blink, scheduleIdleEffect } from './idle-motion.js';
+import { setupCompanionChat } from './companion-chat.js';
 
 const poses = ['idle', 'notice', 'balance', 'dizzy'];
 const farDistance = 180;
+const dragThreshold = 7;
 const dockEase = 'cubic-bezier(.2,.75,.3,1)';
 
 export function setupCompanion(root, tour, reduce) {
   const button = document.getElementById('case-companion');
+  const chat = setupCompanionChat(button);
   const art = button.querySelector('.companion-art');
   const closedFrame = button.querySelector('.companion-closed-frame');
   const example = root.querySelector('.demo-section');
@@ -84,7 +87,10 @@ export function setupCompanion(root, tour, reduce) {
     if (flight && (root.hidden || reduce.matches)) endFlight();
     const visible = root.hidden || workbench.getBoundingClientRect().top < innerHeight * .7
       || (!tour.hidden && example.getBoundingClientRect().top < innerHeight * .6);
-    if (!visible && !flight && !button.hidden) resetInteraction();
+    if (!visible && !flight && !button.hidden) {
+      chat.close();
+      resetInteraction();
+    }
     button.hidden = !visible && !flight;
   }
 
@@ -125,7 +131,7 @@ export function setupCompanion(root, tour, reduce) {
     }, () => {});
   }
 
-  function returnToDock(x, y) {
+  function returnToDock(x, y, pointerType) {
     button.style.transform = '';
     if (reduce.matches) {
       setPose('idle');
@@ -143,21 +149,27 @@ export function setupCompanion(root, tour, reduce) {
       returnAnimation = null;
       restTimer = setTimeout(() => {
         restTimer = 0;
-        setPose(button.matches(':hover') ? 'notice' : 'idle');
+        setPose(pointerType !== 'touch' && button.matches(':hover') ? 'notice' : 'idle');
       }, far ? 420 : 100);
     }, () => {});
   }
 
   function endDrag(event) {
     if (drag?.pointer !== event.pointerId) return;
-    const { x, y } = drag;
+    const { x, y, moved } = drag;
     drag = null;
     delete button.dataset.dragging;
-    returnToDock(x, y);
+    if (moved && event.type === 'pointerup') {
+      returnToDock(x, y, event.pointerType);
+    } else {
+      button.style.transform = '';
+      setPose(event.pointerType !== 'touch' && button.matches(':hover') ? 'notice' : 'idle');
+      if (event.type === 'pointerup') chat.toggle();
+    }
   }
 
-  button.addEventListener('pointerenter', () => {
-    if (!drag && !returnAnimation && !restTimer) setPose('notice');
+  button.addEventListener('pointerenter', event => {
+    if (event.pointerType !== 'touch' && !drag && !returnAnimation && !restTimer) setPose('notice');
   });
   button.addEventListener('pointerleave', () => {
     if (!drag && !returnAnimation && !restTimer) setPose('idle');
@@ -166,9 +178,8 @@ export function setupCompanion(root, tour, reduce) {
     if (event.button !== 0 || drag || returnAnimation) return;
     clearTimeout(restTimer);
     restTimer = 0;
-    drag = { pointer: event.pointerId, originX: event.clientX, originY: event.clientY, x: 0, y: 0 };
+    drag = { pointer: event.pointerId, originX: event.clientX, originY: event.clientY, x: 0, y: 0, moved: false };
     button.setPointerCapture(event.pointerId);
-    button.dataset.dragging = '';
     setPose('notice');
     event.preventDefault();
   });
@@ -176,11 +187,17 @@ export function setupCompanion(root, tour, reduce) {
     if (drag?.pointer !== event.pointerId) return;
     drag.x = event.clientX - drag.originX;
     drag.y = event.clientY - drag.originY;
+    if (!drag.moved) {
+      if (Math.hypot(drag.x, drag.y) < dragThreshold) return;
+      drag.moved = true;
+      button.dataset.dragging = '';
+      chat.close();
+    }
     button.style.transform = `translate(${drag.x}px,${drag.y}px)`;
   });
   ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(type => button.addEventListener(type, endDrag));
   button.addEventListener('click', event => {
-    if (event.detail === 0 && !drag && !returnAnimation && !restTimer) returnToDock(0, 0);
+    if (event.detail === 0 && !drag && !returnAnimation) chat.toggle();
   });
 
   window.addEventListener('scroll', requestUpdate, { passive: true });

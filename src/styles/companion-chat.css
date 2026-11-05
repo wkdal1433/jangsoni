@@ -1,0 +1,131 @@
+.companion-chat {
+  --chat-inset: 18px;
+  --chat-dock-gap: calc(98px + max(18px, env(safe-area-inset-bottom)));
+  --chat-bottom: max(var(--chat-dock-gap), calc(var(--chat-viewport-bottom, 0px) + 12px));
+  position: fixed;
+  z-index: 17;
+  right: max(var(--chat-inset), env(safe-area-inset-right));
+  bottom: var(--chat-bottom);
+  display: flex;
+  flex-direction: column;
+  width: min(360px, calc(100vw - 2 * var(--chat-inset) - env(safe-area-inset-left) - env(safe-area-inset-right)));
+  border: 1px solid #cbddea;
+  border-radius: 18px;
+  background: #fff;
+  color: #202830;
+  box-shadow: 0 12px 36px #23486929;
+}
+#case-companion[data-side="left"] + .companion-chat {
+  right: auto;
+  left: max(var(--chat-inset), env(safe-area-inset-left));
+}
+.companion-chat:has(.companion-chat-conversation:not([hidden])) {
+  height: min(460px, calc(var(--chat-viewport-height, 100dvh) + var(--chat-viewport-bottom, 0px) - var(--chat-bottom) - 12px));
+}
+.companion-chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 12px 6px 16px;
+  border-radius: 17px 17px 0 0;
+  background: #eaf4fc;
+  color: #204e82;
+}
+.companion-chat-header h2 { margin: 0; font-size: 16px; }
+.companion-chat button {
+  min-height: 40px;
+  padding: 6px 12px;
+  border: 1px solid #cbddea;
+  border-radius: 9px;
+  background: #fff;
+  color: #204e82;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.companion-chat button:hover { background: #edf5fc; }
+.companion-chat :is(button, textarea, [role="log"]):focus-visible {
+  outline: 2px solid #2f6db5;
+  outline-offset: 2px;
+}
+.companion-chat .companion-chat-close {
+  width: 40px;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  font-size: 23px;
+  line-height: 1;
+}
+.companion-chat .companion-chat-primary { background: #2864a6; border-color: #2864a6; color: #fff; }
+.companion-chat .companion-chat-primary:hover { background: #204e82; }
+.companion-chat-invitation { padding: 14px 16px; }
+.companion-chat-invitation::after {
+  content: "";
+  position: absolute;
+  right: 36px;
+  bottom: -7px;
+  width: 12px;
+  height: 12px;
+  border-right: 1px solid #cbddea;
+  border-bottom: 1px solid #cbddea;
+  background: #fff;
+  transform: rotate(45deg);
+}
+#case-companion[data-side="left"] + .companion-chat .companion-chat-invitation::after { right: auto; left: 36px; }
+.companion-chat-invitation p { margin: 0 0 12px; font-weight: 700; }
+.companion-chat-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.companion-chat-conversation { display: flex; flex: 1; min-height: 0; flex-direction: column; }
+.companion-chat-log {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 14px;
+  background: #f3f8fc;
+}
+.companion-chat-bubble {
+  align-self: flex-start;
+  flex-shrink: 0;
+  max-width: 88%;
+  padding: 9px 12px;
+  border: 1px solid #dae7f0;
+  border-radius: 4px 14px 14px 14px;
+  background: #fff;
+  overflow-wrap: anywhere;
+}
+.companion-chat-bubble[data-sender="user"] { align-self: flex-end; border-radius: 14px 4px 14px 14px; background: #dcecff; }
+.companion-chat-speaker { display: block; margin-bottom: 3px; color: #305778; font-size: 12px; font-weight: 700; }
+.companion-chat-bubble p { margin: 0; white-space: pre-wrap; }
+.companion-chat-bubble ul { margin: 4px 0 0; padding: 0; list-style: none; font-size: 13px; }
+.companion-chat-composer { padding: 8px 12px 10px; border-top: 1px solid #dae7f0; }
+.companion-chat-composer textarea {
+  display: block;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 7px 9px;
+  resize: none;
+  border: 1px solid #b9cddd;
+  border-radius: 9px;
+  color: inherit;
+  font: inherit;
+  font-size: 16px;
+}
+.companion-chat-pending {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+.companion-chat-pending span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.companion-chat-pending button { flex-shrink: 0; }
+@media (max-width: 720px) {
+  .companion-chat { --chat-inset: 10px; --chat-dock-gap: calc(72px + max(18px, env(safe-area-inset-bottom))); }
+  .companion-chat-invitation::after { right: 24px; }
+  #case-companion[data-side="left"] + .companion-chat .companion-chat-invitation::after { left: 24px; }
+}

@@ -11,6 +11,7 @@
 </style>
 <style id="companion-styles">
 @@COMPANION_CSS@@
+@@COMPANION_CHAT_CSS@@
 </style>
 
 
@@ -438,7 +439,7 @@
     </div>
   </section>
 
-  <button id="case-companion" type="button" aria-label="장손이와 놀기" hidden>
+  <button id="case-companion" type="button" aria-label="장손이 도움말 열기" aria-haspopup="dialog" aria-controls="companion-chat" aria-expanded="false" hidden>
     <span class="companion-art" aria-hidden="true">
       <svg class="companion-closed-frame" viewBox="0 0 610 644" preserveAspectRatio="xMidYMax meet">
         <defs>
@@ -455,6 +456,39 @@
       </svg>
     </span>
   </button>
+  <section id="companion-chat" class="companion-chat" role="dialog" aria-labelledby="companion-chat-title" hidden>
+    <header class="companion-chat-header">
+      <h2 id="companion-chat-title">장손이 도움말</h2>
+      <button type="button" class="companion-chat-close" data-chat-close aria-label="채팅 닫기">×</button>
+    </header>
+    <div class="companion-chat-invitation">
+      <p>도움이 필요하신가요?</p>
+      <div class="companion-chat-actions">
+        <button type="button" data-chat-close>아니오</button>
+        <button type="button" class="companion-chat-primary" data-chat-yes>예</button>
+      </div>
+    </div>
+    <div class="companion-chat-conversation" hidden>
+      <div class="companion-chat-log" role="log" aria-label="장손이와 나눈 대화" tabindex="0">
+        <div class="companion-chat-bubble" data-sender="assistant">
+          <span class="companion-chat-speaker">장손이</span>
+          <p>안녕하세요! 사이트를 이용하면서 궁금한 점이 있으면 남겨 주세요.</p>
+        </div>
+      </div>
+      <form class="companion-chat-composer">
+        <div class="companion-chat-pending" hidden>
+          <span aria-live="polite"></span>
+          <button type="button" data-chat-remove>첨부 지우기</button>
+        </div>
+        <textarea rows="2" aria-label="장손이에게 보낼 메시지" placeholder="메시지를 입력해 주세요" enterkeyhint="send"></textarea>
+        <input type="file" multiple hidden>
+        <div class="companion-chat-actions">
+          <button type="button" data-chat-attach>파일 첨부</button>
+          <button type="submit" class="companion-chat-primary">보내기</button>
+        </div>
+      </form>
+    </div>
+  </section>
 
   <!-- 분쟁조정 탭 데이터: FSS분쟁조정 폴더의 FSS_분쟁조정정보_보험.json을 gzip+base64로 줄여 넣음 -->
   <script>@@FSS_DATA@@</script>
