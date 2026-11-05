@@ -153,8 +153,7 @@ export function setupCompanionChat(trigger, reduce) {
   function confirmGuide() {
     seenGuides.add(currentScreen);
     try { localStorage.setItem(guideStorageKey, JSON.stringify([...seenGuides])); } catch {}
-    show(invitation);
-    yes.focus({ preventScroll: true });
+    close(true);
   }
 
   yes.addEventListener('click', openConversation);
