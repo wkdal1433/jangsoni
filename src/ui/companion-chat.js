@@ -25,7 +25,7 @@ export function setupCompanionChat(trigger, reduce) {
   let currentScreen;
   let motion;
   try {
-    const stored = JSON.parse(localStorage.getItem(guideStorageKey) || '[]');
+    const stored = JSON.parse(sessionStorage.getItem(guideStorageKey) || '[]');
     if (Array.isArray(stored)) stored.forEach(screen => seenGuides.add(screen));
   } catch {}
 
@@ -152,7 +152,7 @@ export function setupCompanionChat(trigger, reduce) {
 
   function confirmGuide() {
     seenGuides.add(currentScreen);
-    try { localStorage.setItem(guideStorageKey, JSON.stringify([...seenGuides])); } catch {}
+    try { sessionStorage.setItem(guideStorageKey, JSON.stringify([...seenGuides])); } catch {}
     close(true);
   }
 
