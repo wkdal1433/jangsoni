@@ -16,6 +16,24 @@
 - 기존 `#intro`, `#menu`, `#start`, `#case-form`, `#intro-yak`, `in-*` 요소와 `showScreen()` 및 `runAutoSearch()` 보존
 - 모바일 배치, 키보드 포커스, 모션 감소 옵션
 
+## 소스 수정과 배포본 생성
+
+`index.html`은 브라우저에서 바로 여는 배포본입니다. 개발할 때는 `src/`의 원본을 수정하세요.
+
+- `src/page.html`과 `src/styles/`에서 화면과 스타일을 관리합니다.
+- `src/analysis.js`와 `src/data/`는 기존 업무 기능과 내장 데이터를 담습니다.
+- `src/ui/navigation.js`는 화면 이동과 브라우저 방문 기록을 관리합니다.
+- `src/ui/journey.js`와 `src/ui/mascot.js`는 둘러보기 스크롤과 장손이 포즈 표시를 나눠 맡습니다.
+- 각 비교안의 포즈는 `src/ui/mascot-config.js`에서 설정합니다. `assets/mascot/runtime/`에는 배포본에 넣는 WebP 이미지가 들어 있습니다.
+
+```sh
+npm ci
+npm run build
+npm run build:check
+```
+
+`npm run build`로 생성한 `index.html`을 소스 변경과 함께 커밋하세요. `npm run build:check`는 생성 결과와 커밋 대상 파일이 일치하는지 검사합니다.
+
 ## 3. 아직 필요한 핵심 아트 자산
 
 **실제 걷기 동작은 미완성입니다.** 원본 PNG는 앉은 자세 한 장이며, 이를 미끄러뜨리거나 흔들어 걸음처럼 속이지 않았습니다. 지금은 안내 구간에 원본 캐릭터가 정적으로 남아 있고 카드 포커스가 스크롤과 연동됩니다. 자연스러운 보행을 완성하려면 다음 투명 배경 PNG를 제작해야 합니다.

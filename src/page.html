@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>장손이</title>
+  <style>
+@@BASE_CSS@@
+</style>
+<style id="landing-styles">
+@@LANDING_CSS@@
+</style>
+
+
+  <!-- 시작 화면 (기존 test.html) -->
+  <section id="intro">
+  <main id="landing-main">
+    <section class="landing-hero landing-container" id="landing-welcome" aria-labelledby="hero-title">
+      <div class="hero-copy landing-reveal">
+        <span class="section-eyebrow">당신 곁의 작은 손해사정 파트너</span>
+        <h1 class="hero-heading" id="hero-title"><span class="line">복잡한 손해사정,</span><span class="line"><em>장손이</em>와 차근차근.</span></h1>
+        <p class="hero-lead">안녕하세요! 저는 장손이예요.<br>보험 약관부터 진단 자료, 판례까지.<br>필요한 정보를 하나씩 함께 살펴볼게요.</p>
+        <div class="hero-actions"><button class="landing-primary" type="button" data-scroll-target="analysis-workbench">사건 분석 시작하기 <span aria-hidden="true">↓</span></button><button class="landing-secondary" id="show-tour" type="button" aria-controls="landing-tour" aria-expanded="false" data-scroll-target="landing-about">장손이와 함께 둘러보기 <span aria-hidden="true">↓</span></button></div>
+      </div>
+      <div class="hero-art landing-reveal"><span class="hero-caption">MEET JANGSONI ✳</span>
+        <div class="mascot-stage" role="img" aria-label="안경을 쓰고 청구 서류와 돋보기를 든 하늘색 수달 캐릭터 장손이">
+          <img class="mascots-img" src="@@HERO_IMAGE@@" alt="장손이: 안경을 쓰고 청구 서류와 돋보기를 든 하늘색 수달 캐릭터">
+          <svg class="mascot-closed-frame" aria-hidden="true" viewBox="0 0 864 934">
+            <defs>
+              <radialGradient id="mascot-blink-edge">
+                <stop offset="75%" stop-color="white"/>
+                <stop offset="100%" stop-color="white" stop-opacity="0"/>
+              </radialGradient>
+              <mask id="mascot-blink-eyes" maskUnits="userSpaceOnUse" x="0" y="0" width="864" height="934">
+                <ellipse cx="343" cy="193" rx="43" ry="37" fill="url(#mascot-blink-edge)"/>
+                <ellipse cx="564" cy="193" rx="43" ry="37" fill="url(#mascot-blink-edge)"/>
+              </mask>
+            </defs>
+            <image href="@@BLINK_IMAGE@@" width="864" height="934" mask="url(#mascot-blink-eyes)"/>
+          </svg>
+        </div>
+        <div class="hero-aside" aria-hidden="true"><span class="symbol">✦</span><span><strong>음… 같이 찾아볼까요?</strong><small>조금 느리지만, 꼼꼼하게!</small></span></div>
+      </div>
+    </section>
+    <div id="landing-tour" hidden>
+    <section class="about-band" id="landing-about"><div class="landing-container">
+      <span class="section-eyebrow landing-reveal">NICE TO MEET YOU</span>
+      <div class="about-title landing-reveal"><h2 class="section-heading" tabindex="-1">어려운 자료도,<br>하나씩 보면 괜찮아요.</h2><p class="section-desc">장손이는 복잡한 손해사정 자료를 찾아보고 정리하는 데 도움을 주는 작은 파트너예요.</p></div>
+      <div class="about-cards">
+        <article class="about-card landing-reveal"><div class="card-icon" aria-hidden="true">▤</div><h3>보험 약관을 꼼꼼하게</h3><p>가입한 상품의 약관과 관련 담보를 차근차근 확인해요.</p></article>
+        <article class="about-card landing-reveal"><div class="card-icon" aria-hidden="true">✳</div><h3>의학 자료를 한곳에서</h3><p>진단코드, 코딩지침, 의학 논문을 연결해 살펴봐요.</p></article>
+        <article class="about-card landing-reveal"><div class="card-icon" aria-hidden="true">⚖</div><h3>법적 근거까지 함께</h3><p>관련 판례와 분쟁조정 사례를 찾아 검토를 도와드려요.</p></article>
+      </div></div></section>
+    <section class="form-guide" id="landing-guide"><div class="landing-container guide-layout">
+      <div class="landing-reveal"><span class="section-eyebrow">HOW IT WORKS</span><h2 class="section-heading guide-title">사건 정보는<br>이렇게 알려주세요.</h2><p class="section-desc">기본 정보를 입력하면, 관련 자료를 찾아볼 수 있어요. 모르는 항목은 비워 두고 시작하셔도 돼요.</p><button class="landing-secondary" style="margin-top:30px" type="button" data-scroll-target="analysis-workbench">직접 입력해 보기 <span aria-hidden="true">↗</span></button></div>
+      <div class="guide-paper landing-reveal"><div class="guide-top"><span>사건 정보 입력 항목</span><span class="dots" aria-hidden="true">● ● ●</span></div><div class="guide-fields">
+        <div class="guide-field"><span class="num">01</span> 보험상품명</div><div class="guide-field"><span class="num">02</span> 보험 가입일</div>
+        <div class="guide-field"><span class="num">03</span> 기고지 직업</div><div class="guide-field"><span class="num">04</span> 진단코드</div>
+        <div class="guide-field"><span class="num">05</span> 청구 담보</div><div class="guide-field"><span class="num">06</span> 주요 쟁점</div>
+        </div><p class="guide-note"><span aria-hidden="true">✳</span> 실제 입력 및 조회 기능은 페이지 아래에서 이용할 수 있어요.</p>
+      </div></div></section>
+    <section class="journey-section journey-cards-left" id="landing-journey"><div class="landing-container">
+      <div class="journey-heading landing-reveal"><span class="section-eyebrow">EXPLORE WITH JANGSONI</span><h2 class="section-heading">장손이와 함께<br>하나씩 둘러볼까요?</h2><p class="section-desc">사건을 입력하기 전에도 각 기능을 열어볼 수 있어요. 사건 정보를 입력했다면 그 내용으로 자료를 찾아요.</p></div>
+      <div class="journey-grid">
+        <aside class="journey-rail" aria-label="현재 안내 단계"><div class="journey-sticky">
+          <div class="journey-mascot-wrap" aria-hidden="true"><img id="journey-static-frame" data-mascot-clone alt=""><img id="journey-walk-frame" alt="" hidden></div>
+          <div class="journey-shadow" aria-hidden="true"></div><div class="journey-speech" id="journey-speech" aria-live="off">여기부터 살펴볼게요.</div>
+          <div class="journey-progress" aria-hidden="true"><span id="journey-counter">01 / 07</span><span class="bar"><i id="journey-progress-bar"></i></span></div>
+        </div></aside>
+        <div class="journey-steps"><article class="journey-step is-active" data-step="0" aria-current="step">
+  <div class="journey-card"><div class="step-top"><span class="step-id">STEP 01 / 07</span><span class="step-symbol" aria-hidden="true">◷</span></div>
+  <h3>사건 타임라인</h3><p>중요한 날짜와 진료 이력을 따라 사건의 흐름을 정리합니다.</p><div class="step-features"><span>날짜·이력</span><span>규칙 기반 검토</span></div>
+  <button class="step-open" type="button" data-preview-go="timeline">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+</article>
+<article class="journey-step" data-step="1">
+  <div class="journey-card"><div class="step-top"><span class="step-id">STEP 02 / 07</span><span class="step-symbol" aria-hidden="true">▤</span></div>
+  <h3>보험 약관</h3><p>가입 당시 상품 약관과 담보별 지급사유·제한사유를 검토합니다.</p><div class="step-features"><span>상품별 약관</span><span>담보 확인</span></div>
+  <button class="step-open" type="button" data-preview-go="yakgwan">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+</article>
+<article class="journey-step" data-step="2">
+  <div class="journey-card"><div class="step-top"><span class="step-id">STEP 03 / 07</span><span class="step-symbol" aria-hidden="true">＋</span></div>
+  <h3>KCD 진단코드</h3><p>질병분류 코드와 코딩지침, 관련 사례를 한곳에서 살펴봅니다.</p><div class="step-features"><span>KCD 검색</span><span>코딩지침</span></div>
+  <button class="step-open" type="button" data-preview-go="koicd">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+</article>
+<article class="journey-step" data-step="3">
+  <div class="journey-card"><div class="step-top"><span class="step-id">STEP 04 / 07</span><span class="step-symbol" aria-hidden="true">⚖</span></div>
+  <h3>판례 검색</h3><p>관련 법률 판례에서 주요 쟁점과 판단 근거를 확인합니다.</p><div class="step-features"><span>쟁점별 판례</span><span>법적 근거</span></div>
+  <button class="step-open" type="button" data-preview-go="law">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+</article>
+<article class="journey-step" data-step="4">
+  <div class="journey-card"><div class="step-top"><span class="step-id">STEP 05 / 07</span><span class="step-symbol" aria-hidden="true">⌕</span></div>
+  <h3>의학 논문</h3><p>PubMed에서 진단명과 의학적 근거를 연결해 찾아봅니다.</p><div class="step-features"><span>PubMed</span><span>의학 근거</span></div>
+  <button class="step-open" type="button" data-preview-go="pubmed">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+</article>
+<article class="journey-step" data-step="5">
+  <div class="journey-card"><div class="step-top"><span class="step-id">STEP 06 / 07</span><span class="step-symbol" aria-hidden="true">≋</span></div>
+  <h3>금감원 분쟁조정</h3><p>분쟁조정 결정례와 사례를 함께 검토합니다.</p><div class="step-features"><span>결정례</span><span>금감원 사례</span></div>
+  <button class="step-open" type="button" data-preview-go="fss">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+</article>
+<article class="journey-step" data-step="6">
+  <div class="journey-card"><div class="step-top"><span class="step-id">STEP 07 / 07</span><span class="step-symbol" aria-hidden="true">▦</span></div>
+  <h3>카드뉴스 제작</h3><p>검토한 내용을 이해하기 쉬운 카드뉴스 형태로 정리합니다.</p><div class="step-features"><span>자료 작성</span><span>결과물 편집</span></div>
+  <button class="step-open" type="button" data-preview-go="cardnews">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+</article></div>
+      </div>
+    </div></section>
+    <section class="demo-section"><div class="landing-container demo-panel">
+      <div class="demo-copy landing-reveal"><span class="section-eyebrow">WHAT YOU GET</span><h2 class="section-heading">찾아본 자료는<br>한눈에 정리해요.</h2><p class="section-desc">사건별로 약관, 분류, 판례 등을 검토하고 결과 작성 단계로 이어갈 수 있어요.</p><small class="demo-disclaimer">※ 오른쪽은 형식을 보여주는 예시이며, 실제 조회·분석 결과가 아닙니다.</small></div>
+      <div class="demo-paper landing-reveal"><div class="demo-paper-top"><span>사건 검토 흐름</span><span class="demo-label">화면 예시</span></div>
+        <div class="demo-line"><span class="label">STEP 01</span><span class="value">사건 정보 및 주요 날짜 확인</span></div>
+        <div class="demo-line"><span class="label">STEP 02</span><span class="value">관련 담보와 약관 조항 조회</span></div>
+        <div class="demo-line"><span class="label">STEP 03</span><span class="value">진단코드 및 의학적 근거 검토</span></div>
+        <div class="demo-line"><span class="label">STEP 04</span><span class="value">판례·분쟁조정 사례 확인 및 카드뉴스 정리</span></div>
+      </div></div></section>
+    </div>
+    <section class="workbench-section" id="analysis-workbench" aria-labelledby="case-input-heading"><div class="landing-container">
+      <div class="workbench-heading"><span class="section-eyebrow">LET'S BEGIN</span><h2 class="section-heading" id="case-input-heading" tabindex="-1">사건 정보 입력</h2><p class="section-desc">사건 정보를 입력해 주세요.<br>장손이가 관련 자료를 찾아볼 수 있도록 도와드릴게요.</p></div>
+      <div class="workbench-card">
+            <!-- 사건 정보 입력: 시작하기를 누르면 이 값으로 각 메뉴를 자동 검색 -->
+    <form id="case-form" class="case-form" autocomplete="off">
+      <label>상품명<input id="in-product" type="text" placeholder="예) 퍼펙트플러스종합보험"></label>
+      <label>보험 가입일<input id="in-date" type="date"></label>
+      <label>기고지 직업<input id="in-job" type="text" placeholder="예) 사무직"></label>
+      <label>진단코드<input id="in-code" type="text" list="kcd-list" placeholder="예) I21"></label>
+      <label>담보명<input id="in-cover" type="text" list="intro-cover-list" placeholder="상품명을 넣으면 약관의 담보에서 골라요"></label>
+      <label>쟁점<input id="in-issue" type="text" list="issue-list" placeholder="예) 외래성"></label>
+      <!-- 상품 약관: 상품명·가입일을 넣으면 바로 공시실 약관을 받아, 담보명은 그 약관의 특약 중에서만 고르게 함 -->
+      <div id="intro-yak" class="intro-yak" hidden></div>
+      <datalist id="intro-cover-list"></datalist>
+      <datalist id="kcd-list"></datalist>
+      <datalist id="cover-list">
+        <option value="일반상해사망"></option><option value="교통재해사망"></option><option value="일반후유장해"></option>
+        <option value="뇌혈관질환진단비"></option><option value="뇌졸중진단비"></option><option value="급성심근경색증진단비"></option>
+        <option value="허혈성심장질환진단비"></option><option value="암진단비"></option><option value="갑상선암진단비"></option>
+      </datalist>
+      <datalist id="issue-list">
+        <option value="외래성"></option><option value="우연성"></option><option value="고지의무"></option>
+        <option value="진단확정"></option><option value="입원 필요성"></option><option value="장해 고정"></option>
+        <option value="암 분류"></option><option value="설명의무"></option><option value="원발부위"></option>
+      </datalist>
+    </form>
+
+
+
+        <div class="workbench-bottom"><p>입력한 사건 정보를 기준으로 관련 메뉴의 검색을 준비합니다. 조회·판정 결과는 검토 보조용으로 활용해 주세요.</p><button id="start" type="button">사건 분석 시작하기 <span aria-hidden="true">↗</span></button></div>
+      </div></div></section>
+  </main>
+  <footer class="landing-footer landing-container"><b>장손이 <span style="font-weight:500;font-size:11px;color:#a0afbd;letter-spacing:0">JANGSONI</span></b><span>차근차근, 정확하게. 함께 살펴보는 손해사정.</span></footer>
+</section>
+
+  <!-- 판례 화면 (기존 03_sketch_law.html) -->
+  <!-- 메뉴 화면 -->
+  <section id="menu" hidden>
+    <div class="wrap">
+      <div class="law-header">
+        <h1>무엇을 찾아볼까요?</h1>
+        <div class="menu-navigation">
+          <button class="back" type="button" data-go="intro">← 처음 화면으로</button>
+          <button class="back" type="button" data-go="intro" data-scroll-target="analysis-workbench">입력 내용 수정</button>
+        </div>
+      </div>
+      <div id="case-summary" class="note case-summary"></div>
+      <div class="menu-grid">
+        <button class="menu-item" type="button" data-go="timeline">사건 타임라인<small>날짜·이력 자동 판정 · 증빙 목록</small><span class="auto-result" id="ar-timeline"></span></button>
+        <button class="menu-item" type="button" data-go="yakgwan">약관<small>지급사유 · 지급 제한사유</small><span class="auto-result" id="ar-yakgwan"></span></button>
+        <button class="menu-item" type="button" data-go="koicd">한국표준질병사인분류(KCD)<small>KCD 9차 분류 · 코딩지침 · 코딩사례</small><span class="auto-result" id="ar-koicd"></span></button>
+        <button class="menu-item" type="button" data-go="law">판례<small>상해사망·장해·뇌혈관·암·심혈관</small><span class="auto-result" id="ar-law"></span></button>
+        <button class="menu-item" type="button" data-go="pubmed">의학 논문<small>PubMed 검색</small><span class="auto-result" id="ar-pubmed"></span></button>
+        <button class="menu-item" type="button" data-go="fss">금융감독원 분쟁조정정보<small>금감원 결정례·해결기준·사례·판례·유의사항</small><span class="auto-result" id="ar-fss"></span></button>
+        <button class="menu-item orange" type="button" data-go="cardnews">카드뉴스 만들기<small>6장 양식 · 바로 편집</small><span class="auto-result" id="ar-cardnews"></span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 약관 화면 (현대해상 공시실 > 보험상품공시) -->
+  <section id="yakgwan" hidden>
+    <div class="wrap wide">
+      <div class="law-header">
+        <h1>약관</h1>
+        <button class="back" type="button" data-go="menu">← 메뉴로</button>
+      </div>
+      <div class="note">
+        상품명·가입일로 <a href="https://www.hi.co.kr/serviceAction.do?menuId=100932" target="_blank" rel="noopener">현대해상 공시실</a>에서
+        가입 당시 판매된 상품의 약관을 찾아, 청구 담보의 지급사유와 지급 제한사유를 원문 그대로 보여 줘요. (인터넷 필요)
+      </div>
+      <!-- 실제 상품 약관 찾기: 처음 화면의 상품명·가입일·담보명이 자동으로 들어감 -->
+      <form id="yak-form" class="yak-form">
+        <label>상품명<input id="yak-product" type="text" placeholder="예) 퍼펙트플러스종합보험"></label>
+        <label>가입일<input id="yak-date" type="date"></label>
+        <label>청구 담보<input id="yak-cover" type="text" placeholder="예) 급성심근경색진단비"></label>
+        <button type="submit">약관 찾기</button>
+      </form>
+      <div id="yak-live"></div>
+
+      <!-- 표준약관 기준 (상품 약관을 못 찾았을 때 참고) -->
+      <details id="yak-std" class="yak-std" open>
+        <summary>표준약관 기준으로 보기 (참고)</summary>
+        <div class="codes">
+          <div class="code-group" id="yak-groups"></div>
+        </div>
+        <div id="yak-panel" class="yak-panel"></div>
+        <p class="crit-src">
+          출처: 보험업감독업무시행세칙 [별표 15] 표준약관 중 질병·상해보험(손해보험 회사용), 2025.6.30. 개정분.
+        </p>
+      </details>
+    </div>
+  </section>
+
+  <!-- 금융감독원 분쟁조정정보 화면 -->
+  <section id="fss" hidden>
+    <div class="wrap wide">
+      <div class="law-header">
+        <h1>금융감독원 분쟁조정정보</h1>
+        <button class="back" type="button" data-go="menu">← 메뉴로</button>
+      </div>
+      <div class="note" id="fss-note">
+        금융감독원 분쟁조정정보(결정례·해결기준·사례·판례·소비자 유의사항) 중 보험 분야 자료를 이 파일에 넣어 두고,
+        처음 화면에 넣은 정보로 관련 자료를 골라 보여 줘요.
+      </div>
+      <form id="fss-form" class="koicd-search">
+        <input id="fss-query" type="search" placeholder="검색어 (예: 고지의무, 뇌경색 진단비, 실손 도수치료)">
+        <button type="submit">찾기</button>
+      </form>
+      <!-- 맞는 자료: 게시판별 건수 요약 + 게시판 탭 + 카드 -->
+      <div id="fss-result"></div>
+    </div>
+  </section>
+
+  <!-- KOICD 질병분류 정보센터 화면 -->
+  <section id="koicd" hidden>
+    <div class="wrap wide">
+      <div class="law-header">
+        <h1>한국표준질병사인분류(KCD)</h1>
+        <button class="back" type="button" data-go="menu">← 메뉴로</button>
+      </div>
+      <div class="note">
+        KCD 9차 질병분류표와 질병코딩지침서·코딩사례집(8차, 9차는 아직 공개 전)을 이 파일에 넣어 두어 인터넷 없이 찾아요.
+        진단코드(예: I21, I63.5) 또는 병명을 넣으세요.
+      </div>
+      <form id="koicd-form" class="koicd-search">
+        <input id="koicd-query" type="search" list="kcd-list" placeholder="진단코드 또는 병명 (예: I21, 뇌경색)">
+        <button type="submit">찾기</button>
+      </form>
+
+      <!-- 검색 결과 (찾기를 누르거나 처음 화면에 진단코드를 넣으면 표시) -->
+      <div id="koicd-result"></div>
+    </div>
+  </section>
+
+  <!-- 의학 논문(PubMed) 화면: PubMed는 다른 화면 안에 넣는 것을 막아 두어서 새 창으로 엶 -->
+  <section id="pubmed" hidden>
+    <div class="wrap">
+      <div class="law-header">
+        <h1>의학 논문 (PubMed)</h1>
+        <button class="back" type="button" data-go="menu">← 메뉴로</button>
+      </div>
+      <div class="note">
+        미국 국립의학도서관의 의학 논문 검색 사이트예요. PubMed는 다른 화면 안에 넣는 것을 막아 두어서, 검색 결과는 <b>새 창</b>으로 열려요. (인터넷 연결 필요, 영어로 검색하면 결과가 더 많아요)
+      </div>
+      <form id="pubmed-form" class="controls">
+        <input id="pubmed-query" type="search" placeholder="검색어 입력 (예: moyamoya disease, lacunar infarction)">
+        <button class="filter active" type="submit">PubMed에서 검색</button>
+        <a class="back" href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" rel="noopener">PubMed 첫 화면 열기</a>
+      </form>
+    </div>
+  </section>
+
+  <!-- 카드뉴스 만들기 화면 -->
+  <section id="cardnews" hidden>
+    <div class="wrap">
+      <div class="law-header">
+        <h1>카드뉴스 만들기</h1>
+        <button class="back" type="button" data-go="menu">← 메뉴로</button>
+      </div>
+      <!-- 카드뉴스 종류: 탭 3개 + 세부 유형 -->
+      <div class="tabs" id="cn-tabs"></div>
+      <div class="filters cn-subs" id="cn-subs"></div>
+      <div class="note">
+        탭과 세부 유형을 고르면 그에 맞는 카드뉴스 양식이 나와요. 한 장에 한 내용씩이고, <b>글자를 눌러 바로 고칠 수 있어요.</b>
+        '(직접 입력)' 칸은 사건마다 채워 주세요. 고친 내용은 유형별로 이 컴퓨터의 브라우저에 자동 저장돼요. 이미지 저장은 인터넷이 연결돼 있어야 해요.
+      </div>
+      <div class="cn-toolbar">
+        <button id="cn-save-all" class="cn-btn primary" type="button">6장 모두 이미지(PNG)로 저장</button>
+        <button id="cn-reset" class="cn-btn" type="button">처음 양식으로 되돌리기</button>
+        <span id="cn-status" class="cn-status"></span>
+      </div>
+      <div id="cn-list" class="cn-list"></div>
+    </div>
+  </section>
+
+  <!-- 사건 타임라인: 날짜·이력 입력 → 자동 판정 → 증빙 체크리스트 → 카드뉴스 반영 -->
+  <section id="timeline" hidden>
+    <div class="wrap wide">
+      <div class="law-header">
+        <h1>사건 타임라인 · 자동 판정</h1>
+        <button class="back" type="button" data-go="menu">← 메뉴로</button>
+      </div>
+      <div class="note">
+        날짜와 진료 이력을 넣고 <b>[판정하기]</b>를 누르면 보장개시·고지의무·해지권·통지의무를 표준약관(질병·상해보험) 규칙으로 자동 판정해요.
+        판정 결과는 <b>검토 보조용</b>이에요. 최종 판단은 실제 상품 약관과 서류로 확인해 주세요. 고객 의료 정보는 이 화면에서 저장하지 않아요(새로고침하면 지워져요).
+      </div>
+
+      <div class="tl-grid">
+        <fieldset class="tl-box">
+          <legend>계약·사고 날짜</legend>
+          <label>청약일(계약일)<input id="tl-apply" type="date"></label>
+          <label>책임개시일<input id="tl-start" type="date"></label>
+          <label>진단확정일·사고일<input id="tl-event" type="date"></label>
+          <label>판정 기준일 (오늘)<input id="tl-today" type="date"></label>
+          <label>청구 담보<input id="tl-cover" type="text" list="cover-list" placeholder="예) 뇌혈관질환진단비"></label>
+          <label class="inline"><input id="tl-diagcontract" type="checkbox"> 진단계약(가입 때 건강진단)</label>
+        </fieldset>
+
+        <fieldset class="tl-box">
+          <legend>진단비 조건 (해당 시)</legend>
+          <label>면책기간 (책임개시 후 ○일)<input id="tl-waitdays" type="number" min="0" placeholder="예) 90"></label>
+          <label>감액기간 (책임개시 후 ○년)<input id="tl-reduceyears" type="number" min="0" step="0.5" placeholder="예) 1"></label>
+          <label>감액기간 지급률 (%)<input id="tl-reducerate" type="number" min="0" max="100" placeholder="예) 50"></label>
+          <label>진단 근거 검사
+            <select id="tl-diagbasis">
+              <option value="">선택 안 함</option>
+              <option value="confirm">확정검사 (CT·MRI·조직검사 등)</option>
+              <option value="screen">선별검사만 (초음파·혈액검사 등)</option>
+              <option value="clinical">임상 소견만 (검사 결과 없음)</option>
+            </select>
+          </label>
+        </fieldset>
+
+        <fieldset class="tl-box">
+          <legend>고지의무 · 해지권</legend>
+          <label>회사가 위반 사실을 안 날<input id="tl-known" type="date"></label>
+          <label class="inline"><input id="tl-insurerknew" type="checkbox"> 회사가 계약 당시 알았거나 과실로 몰랐음</label>
+          <label class="inline"><input id="tl-agentblock" type="checkbox"> 설계사가 고지 기회를 안 주거나 방해·부실고지 권유</label>
+        </fieldset>
+
+        <fieldset class="tl-box">
+          <legend>통지의무 (직업)</legend>
+          <label>가입 때 알린 직업<input id="tl-job0" type="text" placeholder="예) 사무직"></label>
+          <label>사고 당시 직업<input id="tl-job1" type="text" placeholder="예) 택배 배송기사"></label>
+          <label>직업 바뀐 날<input id="tl-jobdate" type="date"></label>
+          <label>위험 변화
+            <select id="tl-risk">
+              <option value="">선택 안 함</option>
+              <option value="up">위험 증가 (요율 상승)</option>
+              <option value="same">변화 없음</option>
+              <option value="down">위험 감소 (요율 하락)</option>
+            </select>
+          </label>
+          <label>변경 전 요율<input id="tl-rate0" type="number" min="0" step="0.01" placeholder="예) 0.5"></label>
+          <label>변경 후 요율<input id="tl-rate1" type="number" min="0" step="0.01" placeholder="예) 1.0"></label>
+          <label class="inline"><input id="tl-notified" type="checkbox"> 직업 변경을 회사에 알림</label>
+          <label class="inline"><input id="tl-jobrelated" type="checkbox" checked> 사고가 바뀐 직업(업무)과 관련 있음</label>
+        </fieldset>
+      </div>
+
+      <fieldset class="tl-box tl-history">
+        <legend>가입 전 진료·투약 이력 (요양급여내역·진료기록 기준)</legend>
+        <div class="tl-hint">청약서 질문 기간(표준 청약서 기준): 3개월 이내 진찰·검사·치료·투약 / 1년 이내 추가검사(재검사) / 5년 이내 입원·수술·7일 이상 치료·30일 이상 투약 / 5년 이내 10대 질병(암·고혈압·협심증·심근경색·뇌졸중·당뇨 등). 상품별 청약서 질문을 꼭 확인하세요.</div>
+        <div id="tl-rows"></div>
+        <button id="tl-addrow" class="cn-btn" type="button">+ 이력 추가</button>
+      </fieldset>
+
+      <div class="cn-toolbar">
+        <button id="tl-run" class="cn-btn primary" type="button">판정하기</button>
+        <button id="tl-sample" class="cn-btn" type="button">예시 사건 불러오기</button>
+        <button id="tl-apply-cn" class="cn-btn" type="button" disabled>카드뉴스에 반영하기</button>
+      </div>
+
+      <div id="tl-result" class="tl-result" hidden>
+        <h2>자동 판정 결과</h2>
+        <div id="tl-findings"></div>
+        <h2>증빙 체크리스트</h2>
+        <div id="tl-checklist" class="tl-checklist"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 준비 중 화면 -->
+  <section id="soon" hidden>
+    <div class="wrap">
+      <div class="law-header">
+        <h1 id="soon-title">준비 중</h1>
+        <button class="back" type="button" data-go="menu">← 메뉴로</button>
+      </div>
+      <div class="empty">아직 준비 중인 메뉴예요.</div>
+    </div>
+  </section>
+
+  <section id="law" hidden>
+    <div class="wrap">
+      <div class="law-header">
+        <h1>장기 손해사정 판례</h1>
+        <button id="home" class="back" type="button" data-go="menu">← 메뉴로</button>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" type="button" data-category="상해사망">상해사망</button>
+        <button class="tab" type="button" data-category="장해">장해</button>
+        <button class="tab" type="button" data-category="뇌혈관질환">뇌혈관질환</button>
+        <button class="tab" type="button" data-category="암">암</button>
+        <button class="tab" type="button" data-category="심혈관질환">심혈관질환</button>
+      </div>
+
+      <div class="note" id="note-injury">
+        상해사고는 <b>급격성·우연성·외래성</b>을 모두 갖춰야 해요.
+        아래는 상해(재해)사망 보험금 청구에서 상해사고가 인정되지 않은 대법원 판례예요.
+        출처: 법제처 판례 데이터
+      </div>
+
+      <div class="controls">
+        <input id="search" type="search" placeholder="검색어 입력 (예: 심근경색, 2010다12241)">
+        <div class="filters" id="type-filters">
+          <button class="filter active" type="button" data-type="전체">전체</button>
+          <button class="filter" type="button" data-type="급격성">급격성</button>
+          <button class="filter" type="button" data-type="우연성">우연성</button>
+          <button class="filter" type="button" data-type="외래성">외래성</button>
+        </div>
+      </div>
+
+      <div id="count"></div>
+      <div id="cards" class="cards"></div>
+
+      <!-- 법제처 실시간 판례 검색: 판례 탭에 들어올 때마다 새로 검색해 새 판례도 보이게 -->
+      <div class="live-law">
+        <h2>법제처 최신 판례 검색 <span id="live-law-time" class="live-time"></span></h2>
+        <div class="note">
+          위 카드는 이 파일에 저장해 둔 판례예요. 아래는 판례 탭에 들어올 때마다 국가법령정보센터에서 <b>새로 검색한 결과</b>라서, 저장 뒤에 추가된 판례도 볼 수 있어요. (인터넷 연결 필요)
+        </div>
+        <form id="live-law-form" class="controls">
+          <input id="live-law-query" type="search" placeholder="검색어 (예: 심근경색 보험금)">
+          <button class="cn-btn primary" type="submit">다시 검색</button>
+          <a id="live-law-newtab" class="back" href="https://www.law.go.kr/precSc.do?menuId=7" target="_blank" rel="noopener">새 창에서 열기</a>
+        </form>
+        <iframe id="live-law-frame" class="site-frame" title="국가법령정보센터 판례 검색"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- 분쟁조정 탭 데이터: FSS분쟁조정 폴더의 FSS_분쟁조정정보_보험.json을 gzip+base64로 줄여 넣음 -->
+  <script>@@FSS_DATA@@</script>
+  <!-- KOICD 탭 데이터: KCD9 폴더의 KCD9_질병분류표.csv, KCD8_질병코딩지침서.html, KCD8_코딩사례집을 gzip+base64로 줄여 넣음 -->
+  <script>@@KOICD_DATA@@</script>
+  <script>
+@@ANALYSIS_JS@@
+</script>
+
+
+
+<script id="landing-script">
+@@APP_JS@@
+</script>
