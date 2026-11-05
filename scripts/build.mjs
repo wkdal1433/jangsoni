@@ -1,19 +1,14 @@
 import { readFile, writeFile } from 'node:fs/promises';
-import { extname, join } from 'node:path';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
+import { loadMascotAssets } from './mascot-assets.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const output = join(root, 'index.html');
 const readText = async file => (await readFile(join(root, file), 'utf8')).replace(/\r\n/g, '\n');
 
-async function imageData(file) {
-  const data = await readFile(join(root, file));
-  const format = extname(file).slice(1);
-  return `data:image/${format};base64,${data.toString('base64')}`;
-}
-
-const assets = JSON.parse(await readText('src/mascot-assets.json'));
+const assets = await loadMascotAssets(root);
 const app = await build({
   absWorkingDir: root,
   entryPoints: ['src/ui/main.js'],
@@ -21,6 +16,16 @@ const app = await build({
   format: 'iife',
   globalName: 'Jangsoni',
   loader: { '.webp': 'dataurl' },
+  plugins: [{
+    name: 'mascot-assets',
+    setup(builder) {
+      builder.onResolve({ filter: /^mascot-assets$/ }, () => ({ path: 'mascot-assets', namespace: 'mascot' }));
+      builder.onLoad({ filter: /.*/, namespace: 'mascot' }, () => ({
+        contents: JSON.stringify(assets.runtime),
+        loader: 'json',
+      }));
+    },
+  }],
   write: false,
 });
 
@@ -32,9 +37,7 @@ const values = Object.fromEntries(await Promise.all([
   ['FSS_DATA', readText('src/data/fss.js')],
   ['KOICD_DATA', readText('src/data/koicd.js')],
   ['ANALYSIS_JS', readText('src/analysis.js')],
-  ['HERO_IMAGE', imageData(assets.hero)],
-  ['BLINK_IMAGE', imageData(assets.blink)],
-  ['COMPANION_BLINK_IMAGE', imageData(assets.companionBlink)],
+  ...Object.entries(assets.html),
   ['APP_JS', app.outputFiles[0].text.trimEnd().replace(/<\/script/gi, '<\\/script')],
 ].map(async ([name, value]) => [name, await value])));
 

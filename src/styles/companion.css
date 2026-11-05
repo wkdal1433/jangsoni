@@ -1,7 +1,8 @@
 #case-companion {
+  --companion-inset: 18px;
   --companion-hover-lean: -2deg;
   position: fixed;
-  right: max(18px, env(safe-area-inset-right));
+  right: max(var(--companion-inset), env(safe-area-inset-right));
   bottom: max(18px, env(safe-area-inset-bottom));
   z-index: 15;
   width: 88px;
@@ -35,8 +36,6 @@
 .companion-hint-help { right: 0; top: -28px; transform: rotate(-10deg); }
 .companion-hint-search { right: 70px; top: -5px; transform: rotate(9deg); --hint-delay: -.9s; }
 .companion-hint svg { display: block; width: 100%; height: 100%; filter: drop-shadow(0 3px 4px #2a567616); }
-#case-companion[data-side="left"] .companion-hint-help { right: auto; left: 0; }
-#case-companion[data-side="left"] .companion-hint-search { right: auto; left: 70px; }
 @media (hover: hover) and (pointer: fine) {
   #case-companion:hover[aria-expanded="false"]:not([data-dragging]):is([data-pose="idle"], [data-pose="notice"]) .companion-hints { opacity: 1; transform: none; }
 }
@@ -58,7 +57,7 @@
   .companion-closed-frame { visibility: hidden; }
 }
 @media (max-width: 720px) {
-  #case-companion { width: 62px; height: 62px; right: max(10px, env(safe-area-inset-right)); }
+  #case-companion { --companion-inset: 10px; width: 62px; height: 62px; }
   .companion-hint-search { right: 52px; }
   html:has(:is(input, select, textarea, [contenteditable]):not(#companion-chat *):focus) #case-companion { visibility: hidden; }
 }

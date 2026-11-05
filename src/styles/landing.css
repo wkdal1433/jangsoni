@@ -43,7 +43,7 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
 }
 #intro .has-mascot-atlas .journey-shadow { display:none; }
 #intro img.mascots-img { margin:0; filter:none; max-width:100%; }
-#intro .hero-aside { position:absolute; right:-15px; bottom:11%; z-index:2; background:#fff; padding:15px 19px; border:1px solid #ebf1f4; box-shadow:0 20px 40px rgba(44,81,120,.1); border-radius:19px; display:flex; gap:10px; align-items:center; transform:rotate(3deg); }
+#intro .hero-aside { position:absolute; right:-15px; top:calc(100% - 20px); bottom:auto; z-index:2; background:#fff; padding:15px 19px; border:1px solid #ebf1f4; box-shadow:0 20px 40px rgba(44,81,120,.1); border-radius:19px; display:flex; gap:10px; align-items:center; transform:rotate(3deg); }
 #intro .hero-aside .symbol { color:var(--js-blue); font-size:18px; }
 #intro .hero-aside strong { font-size:13px; }
 #intro .hero-aside small { display:block; color:#8b9bab; font-size:11px; margin-top:2px; }
@@ -184,7 +184,7 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
  #intro .hero-art { min-height:0; margin-top:23px; padding:0 6%; }
  #intro .mascot-stage { width:min(100%,340px); }
  #intro .hero-art .hero-caption { top:25px; right:4px; font-size:10px; }
- #intro .hero-aside { right:0; bottom:8%; transform:rotate(3deg) scale(.88); transform-origin:right bottom; }
+ #intro .hero-aside { right:0; bottom:auto; transform:rotate(3deg) scale(.88); transform-origin:right bottom; }
  #intro .about-band,#intro .form-guide,#intro .journey-section,#intro .demo-section,#intro .workbench-section { padding-block:79px; }
  #intro .section-heading { font-size:clamp(30px,8vw,38px); }
  #intro .section-desc { font-size:15px; }

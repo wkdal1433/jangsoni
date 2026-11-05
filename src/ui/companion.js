@@ -1,4 +1,4 @@
-import companionSource from '../../assets/mascot/runtime/companion.webp';
+import { companion as companionSource, mirrored } from 'mascot-assets';
 import { mountAtlas } from './sprite.js';
 import { blink, scheduleIdleEffect } from './idle-motion.js';
 import { setupCompanionChat } from './companion-chat.js';
@@ -37,11 +37,10 @@ export function setupCompanion(root, tour, reduce) {
   }
 
   function fidget() {
-    const inward = button.dataset.side === 'left' ? 1 : -1;
     const middle = [
       'translateY(-2px) scale(1.01,1.02)',
-      `translateX(${inward * 2}px) rotate(${inward * 3}deg)`,
-      `translateY(-1px) rotate(${inward * -2}deg)`,
+      'translateX(-2px) rotate(-3deg)',
+      'translateY(-1px) rotate(2deg)',
     ];
     art.animate([
       { transform: 'none' },
@@ -216,7 +215,7 @@ export function setupCompanion(root, tour, reduce) {
   image.onload = () => {
     tileWidth = image.naturalWidth / 2;
     tileHeight = image.naturalHeight / 2;
-    sprite = mountAtlas(art, image, [0, 0, tileWidth, tileHeight], 'companion-sprite');
+    sprite = mountAtlas(art, image, [0, 0, tileWidth, tileHeight], 'companion-sprite', mirrored);
     setPose('idle');
     update();
   };

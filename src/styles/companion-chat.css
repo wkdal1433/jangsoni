@@ -25,11 +25,6 @@ html.companion-guiding { overflow: hidden; scrollbar-gutter: stable; }
   box-shadow: 0 12px 36px #23486929;
   transform-origin: bottom right;
 }
-#case-companion[data-side="left"] + .companion-chat {
-  right: auto;
-  left: max(var(--chat-inset), env(safe-area-inset-left));
-  transform-origin: bottom left;
-}
 .companion-chat:has(.companion-chat-conversation:not([hidden])) {
   height: min(460px, calc(var(--chat-viewport-height, 100dvh) + var(--chat-viewport-bottom, 0px) - var(--chat-bottom) - 12px));
 }
@@ -83,7 +78,6 @@ html.companion-guiding { overflow: hidden; scrollbar-gutter: stable; }
   background: #fff;
   transform: rotate(45deg);
 }
-#case-companion[data-side="left"] + .companion-chat .companion-chat-invitation::after { right: auto; left: 36px; }
 .companion-chat-invitation p { margin: 0 0 12px; font-weight: 700; }
 .companion-chat-guide { padding: 14px 16px; max-height: calc(var(--chat-viewport-height, 100dvh) + var(--chat-viewport-bottom, 0px) - var(--chat-bottom) - 70px); overflow-y: auto; overscroll-behavior: contain; }
 .companion-chat-guide h3 { margin: 0; font-size: 16px; }
@@ -150,5 +144,4 @@ html.companion-guiding { overflow: hidden; scrollbar-gutter: stable; }
 @media (max-width: 720px) {
   .companion-chat { --chat-inset: 10px; --chat-dock-gap: calc(72px + max(18px, env(safe-area-inset-bottom))); }
   .companion-chat-invitation::after { right: 24px; }
-  #case-companion[data-side="left"] + .companion-chat .companion-chat-invitation::after { left: 24px; }
 }

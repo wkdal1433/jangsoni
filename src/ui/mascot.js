@@ -1,8 +1,8 @@
 import { mountAtlas } from './sprite.js';
+import { mirrored } from './mascot-config.js';
 
 export function createMascot(root, atlas) {
  const original=root.querySelector('img.mascots-img');
- const stage=root.querySelector('.hero-art .mascot-stage');
  root.querySelectorAll('img[data-mascot-clone]').forEach(img=>{ img.src=original.src; });
  const avatar=root.querySelector('.journey-mascot-wrap');
  const walkImg=root.querySelector('#journey-walk-frame');
@@ -16,12 +16,7 @@ export function createMascot(root, atlas) {
  if(atlas){
    const source=new Image();
    source.onload=()=>{
-     if(atlas.hero){
-       mountAtlas(stage,source,atlas.hero,atlas.referenceBackground?'mascot-atlas reference-atlas':'mascot-atlas');
-       original.hidden=true;
-       stage.classList.add('has-mascot-atlas');
-     }
-     journeyAtlas=mountAtlas(avatar,source,atlas.stand,atlas.referenceBackground?'mascot-atlas reference-atlas':'mascot-atlas');
+     journeyAtlas=mountAtlas(avatar,source,atlas.stand,'mascot-atlas',mirrored);
      staticImg.hidden=true;
      avatar.closest('.journey-sticky').classList.add('has-mascot-atlas');
      spritesReady=true;

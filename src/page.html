@@ -28,19 +28,7 @@
       <div class="hero-art landing-reveal"><span class="hero-caption">MEET JANGSONI ✳</span>
         <div class="mascot-stage" role="img" aria-label="안경을 쓰고 청구 서류와 돋보기를 든 하늘색 수달 캐릭터 장손이">
           <img class="mascots-img" src="@@HERO_IMAGE@@" alt="장손이: 안경을 쓰고 청구 서류와 돋보기를 든 하늘색 수달 캐릭터">
-          <svg class="mascot-closed-frame" aria-hidden="true" viewBox="0 0 864 934">
-            <defs>
-              <radialGradient id="mascot-blink-edge">
-                <stop offset="75%" stop-color="white"/>
-                <stop offset="100%" stop-color="white" stop-opacity="0"/>
-              </radialGradient>
-              <mask id="mascot-blink-eyes" maskUnits="userSpaceOnUse" x="0" y="0" width="864" height="934">
-                <ellipse cx="343" cy="193" rx="43" ry="37" fill="url(#mascot-blink-edge)"/>
-                <ellipse cx="564" cy="193" rx="43" ry="37" fill="url(#mascot-blink-edge)"/>
-              </mask>
-            </defs>
-            <image href="@@BLINK_IMAGE@@" width="864" height="934" mask="url(#mascot-blink-eyes)"/>
-          </svg>
+          @@HERO_BLINK_FRAME@@
         </div>
         <div class="hero-aside" aria-hidden="true"><span class="symbol">✦</span><span><strong>음… 같이 찾아볼까요?</strong><small>조금 느리지만, 꼼꼼하게!</small></span></div>
       </div>
@@ -441,19 +429,7 @@
 
   <button id="case-companion" type="button" aria-label="장손이 도움말 열기" aria-haspopup="dialog" aria-controls="companion-chat" aria-expanded="false" hidden>
     <span class="companion-art" aria-hidden="true">
-      <svg class="companion-closed-frame" viewBox="0 0 610 644" preserveAspectRatio="xMidYMax meet">
-        <defs>
-          <radialGradient id="companion-blink-edge">
-            <stop offset=".84" stop-color="#fff"/>
-            <stop offset="1" stop-color="#fff" stop-opacity="0"/>
-          </radialGradient>
-          <mask id="companion-blink-eyes">
-            <ellipse cx="233" cy="147" rx="32" ry="27" fill="url(#companion-blink-edge)"/>
-            <ellipse cx="372" cy="147" rx="32" ry="27" fill="url(#companion-blink-edge)"/>
-          </mask>
-        </defs>
-        <image href="@@COMPANION_BLINK_IMAGE@@" width="610" height="644" preserveAspectRatio="none" mask="url(#companion-blink-eyes)"/>
-      </svg>
+      @@COMPANION_BLINK_FRAME@@
     </span>
     <span class="companion-hints" aria-hidden="true">
       <span class="companion-hint companion-hint-help">
