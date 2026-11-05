@@ -169,7 +169,7 @@
         <button class="menu-item" type="button" data-go="law">판례<small>상해사망·장해·뇌혈관·암·심혈관</small><span class="auto-result" id="ar-law"></span></button>
         <button class="menu-item" type="button" data-go="pubmed">의학 논문<small>PubMed 검색</small><span class="auto-result" id="ar-pubmed"></span></button>
         <button class="menu-item" type="button" data-go="fss">금융감독원 분쟁조정정보<small>금감원 결정례·해결기준·사례·판례·유의사항</small><span class="auto-result" id="ar-fss"></span></button>
-        <button class="menu-item orange" type="button" data-go="cardnews">카드뉴스 만들기<small>6장 양식 · 바로 편집</small><span class="auto-result" id="ar-cardnews"></span></button>
+        <button class="menu-item" type="button" data-go="cardnews">카드뉴스 만들기<small>6장 양식 · 바로 편집</small><span class="auto-result" id="ar-cardnews"></span></button>
       </div>
     </div>
   </section>
@@ -438,7 +438,23 @@
     </div>
   </section>
 
-  <button id="case-companion" type="button" aria-label="장손이와 놀기" hidden></button>
+  <button id="case-companion" type="button" aria-label="장손이와 놀기" hidden>
+    <span class="companion-art" aria-hidden="true">
+      <svg class="companion-closed-frame" viewBox="0 0 610 644" preserveAspectRatio="xMidYMax meet">
+        <defs>
+          <radialGradient id="companion-blink-edge">
+            <stop offset=".84" stop-color="#fff"/>
+            <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+          </radialGradient>
+          <mask id="companion-blink-eyes">
+            <ellipse cx="233" cy="147" rx="32" ry="27" fill="url(#companion-blink-edge)"/>
+            <ellipse cx="372" cy="147" rx="32" ry="27" fill="url(#companion-blink-edge)"/>
+          </mask>
+        </defs>
+        <image href="@@COMPANION_BLINK_IMAGE@@" width="610" height="644" preserveAspectRatio="none" mask="url(#companion-blink-eyes)"/>
+      </svg>
+    </span>
+  </button>
 
   <!-- 분쟁조정 탭 데이터: FSS분쟁조정 폴더의 FSS_분쟁조정정보_보험.json을 gzip+base64로 줄여 넣음 -->
   <script>@@FSS_DATA@@</script>

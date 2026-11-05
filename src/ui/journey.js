@@ -13,6 +13,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  const afterJourney=root.querySelector(".demo-section");
  const wheelQuietTime=120;
  let active=-1, updateFrame=0, journeyFrame=0, lastWheel=-Infinity;
+ let cardReaction;
 
  function setActive(index){
    if(index===active) return;
@@ -58,6 +59,17 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    avatar.style.transform='';
  }
 
+ function reactToCard(index){
+   const card=steps[index].querySelector('.journey-card').getBoundingClientRect();
+   const actor=avatar.getBoundingClientRect();
+   const towardCard=Math.sign(card.left+card.width/2-actor.left-actor.width/2);
+   cardReaction=avatar.animate([
+     {transform:'none'},
+     {transform:`translate(${towardCard*3}px, 2px) rotate(${towardCard*2}deg)`,offset:.48},
+     {transform:'none'},
+   ],{delay:120,duration:460,easing:'ease-in-out'});
+ }
+
  function moveJourney(destination,index,walking=false){
    const duration=walking?walkDuration:boundaryDuration;
    const origin=window.scrollY;
@@ -73,6 +85,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
        window.scrollTo({top:destination,behavior:'instant'});
        if(index!==null) setActive(index);
        stopJourneyTransition();
+       if(index!==null) reactToCard(index);
        return;
      }
      const travel=progress*progress*(3-2*progress);
@@ -116,6 +129,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
      event.preventDefault();
      lastWheel=now;
      const entry=enteringFromAbove?0:centers.length-1;
+     cardReaction?.cancel();
      moveJourney(centers[entry]-halfViewport,entry);
      return;
    }
@@ -123,6 +137,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    const next=nearestCard(centers,viewCenter)+direction;
    event.preventDefault();
    lastWheel=now;
+   cardReaction?.cancel();
    if(next<0||next>=centers.length){
      if(next>=centers.length) handoff(avatar,boundaryDuration);
      const destination=(next<0?beforeJourney:afterJourney).getBoundingClientRect();
@@ -136,8 +151,10 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  window.addEventListener('wheel',onJourneyWheel,{passive:false});
  window.addEventListener('scroll',requestUpdate,{passive:true});
  window.addEventListener('resize',()=>{
+   cardReaction?.cancel();
    if(journeyFrame) stopJourneyTransition();
    requestUpdate();
  });
+ reduce.addEventListener('change',()=>{if(reduce.matches) cardReaction?.cancel();});
  requestUpdate();
 }

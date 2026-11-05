@@ -32,12 +32,8 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
 #intro .mascot-stage.is-noticing { transform:rotate(-1.6deg) translateY(-4px); }
 #intro .mascot-stage img { display:block; width:100%; height:auto; object-fit:contain; }
 #intro .mascot-closed-frame { position:absolute; inset:0; width:100%; height:100%; opacity:0; pointer-events:none; }
-@media (prefers-reduced-motion:no-preference) {
- #intro .mascot-closed-frame { animation:js-mascot-blink 6.2s steps(1,end) infinite; }
-}
-@keyframes js-mascot-blink {
- 0%,98%,100% { opacity:0; }
- 95.5% { opacity:1; }
+@media (prefers-reduced-motion:reduce) {
+ #intro .mascot-closed-frame { visibility:hidden; }
 }
 #intro .mascot-atlas { display:block; width:100%; height:auto; overflow:hidden; }
 #intro .reference-atlas {

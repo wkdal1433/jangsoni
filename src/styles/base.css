@@ -71,9 +71,6 @@
     .auto-result .v { min-width: 0; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; word-break: keep-all; }
     .auto-result .v.long { -webkit-line-clamp: 2; }
     .auto-result .v b { color: #FF7A29; }
-    .menu-item.orange .auto-result { color: #fff; border-top-color: rgba(255,255,255,0.4); }
-    .menu-item.orange .auto-result .k { color: rgba(255,255,255,0.8); }
-    .menu-item.orange .auto-result .v b { color: #fff; }
     /* 메뉴 위 입력한 사건 정보: 항목별 칩 */
     .case-summary { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
     .case-summary:empty { display: none; }
@@ -481,12 +478,11 @@
       cursor: pointer;
       text-align: left;
     }
-    .menu-item:hover { border-color: #FF7A29; color: #FF7A29; }
+    .menu-item:hover { border-color: #FF7A29; }
+    .menu-item:focus-visible { outline: 2px solid #b94d11; outline-offset: 2px; }
+    .menu-item:active { background: #fff6ee; }
     .menu-item small { display: block; margin-top: 4px; font-size: 0.8rem; font-weight: normal; color: #888888; }
     /* 현대해상 로고 주황색 */
-    .menu-item.orange { background: #FF7A29; border-color: #FF7A29; color: #fff; }
-    .menu-item.orange small { color: #fff; opacity: 0.9; }
-    .menu-item.orange:hover { background: #E8651A; border-color: #E8651A; color: #fff; }
 
     .tabs { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 2px solid #DDDDDD; margin-bottom: 20px; }
     .tab {

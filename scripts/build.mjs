@@ -33,6 +33,7 @@ const values = Object.fromEntries(await Promise.all([
   ['ANALYSIS_JS', readText('src/analysis.js')],
   ['HERO_IMAGE', imageData(assets.hero)],
   ['BLINK_IMAGE', imageData(assets.blink)],
+  ['COMPANION_BLINK_IMAGE', imageData(assets.companionBlink)],
   ['APP_JS', app.outputFiles[0].text.trimEnd().replace(/<\/script/gi, '<\\/script')],
 ].map(async ([name, value]) => [name, await value])));
 

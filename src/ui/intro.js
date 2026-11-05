@@ -1,3 +1,5 @@
+import { blink, scheduleIdleEffect } from './idle-motion.js';
+
 export function setupIntro(root, reduce, navigate) {
  document.querySelectorAll('[data-scroll-target]:not([data-go])').forEach(button => {
    button.addEventListener('click', () => navigate('intro', button.dataset.scrollTarget));
@@ -12,6 +14,8 @@ export function setupIntro(root, reduce, navigate) {
    });
  });
  const stage=root.querySelector('.hero-art .mascot-stage');
+ const closedFrame=stage.querySelector('.mascot-closed-frame');
+ scheduleIdleEffect(stage,reduce,[2700,5000],()=>true,()=>blink(closedFrame));
  if(stage && !reduce.matches){
    let noticeTimer=0;
    stage.addEventListener('pointerenter',(e)=>{

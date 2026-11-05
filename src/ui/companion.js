@@ -1,5 +1,6 @@
 import companionSource from '../../assets/mascot/runtime/companion.webp';
 import { mountAtlas } from './sprite.js';
+import { blink, scheduleIdleEffect } from './idle-motion.js';
 
 const poses = ['idle', 'notice', 'balance', 'dizzy'];
 const farDistance = 180;
@@ -7,6 +8,8 @@ const dockEase = 'cubic-bezier(.2,.75,.3,1)';
 
 export function setupCompanion(root, tour, reduce) {
   const button = document.getElementById('case-companion');
+  const art = button.querySelector('.companion-art');
+  const closedFrame = button.querySelector('.companion-closed-frame');
   const example = root.querySelector('.demo-section');
   const workbench = document.getElementById('analysis-workbench');
   const image = new Image();
@@ -16,12 +19,40 @@ export function setupCompanion(root, tour, reduce) {
   let restTimer = 0;
   let flight = null;
   let updateFrame = 0;
+  let idleGesture = 0;
+
+  function editing() {
+    return document.activeElement.matches('input, select, textarea, [contenteditable]');
+  }
+
+  function canIdle() {
+    return !!sprite && !button.hidden && !flight && !editing() && button.dataset.pose === 'idle';
+  }
+
+  function stopIdleMotion() {
+    art.getAnimations({ subtree: true }).forEach(animation => animation.cancel());
+  }
+
+  function fidget() {
+    const inward = button.dataset.side === 'left' ? 1 : -1;
+    const middle = [
+      'translateY(-2px) scale(1.01,1.02)',
+      `translateX(${inward * 2}px) rotate(${inward * 3}deg)`,
+      `translateY(-1px) rotate(${inward * -2}deg)`,
+    ];
+    art.animate([
+      { transform: 'none' },
+      { transform: middle[idleGesture++ % middle.length] },
+      { transform: 'none' },
+    ], { duration: 730, easing: 'ease-in-out' });
+  }
 
   function setPose(pose) {
     const index = poses.indexOf(pose);
     const crop = [(index % 2) * tileWidth, Math.floor(index / 2) * tileHeight, tileWidth, tileHeight];
     sprite.setAttribute('viewBox', crop.join(' '));
     button.dataset.pose = pose;
+    if (pose !== 'idle') stopIdleMotion();
   }
 
   function resetInteraction() {
@@ -34,6 +65,7 @@ export function setupCompanion(root, tour, reduce) {
     restTimer = 0;
     button.style.transform = '';
     delete button.dataset.dragging;
+    stopIdleMotion();
     setPose('idle');
   }
 
@@ -161,14 +193,19 @@ export function setupCompanion(root, tour, reduce) {
     if (sprite && reduce.matches) resetInteraction();
     update();
   });
+  document.addEventListener('focusin', () => {
+    if (editing()) stopIdleMotion();
+  });
   image.onload = () => {
     tileWidth = image.naturalWidth / 2;
     tileHeight = image.naturalHeight / 2;
-    sprite = mountAtlas(button, image, [0, 0, tileWidth, tileHeight], 'companion-sprite');
+    sprite = mountAtlas(art, image, [0, 0, tileWidth, tileHeight], 'companion-sprite');
     setPose('idle');
     update();
   };
   image.src = companionSource;
+  scheduleIdleEffect(button, reduce, [2500, 4800], canIdle, () => blink(closedFrame));
+  scheduleIdleEffect(button, reduce, [2300, 4300], canIdle, fidget);
 
   return { update, handoff };
 }
