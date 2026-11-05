@@ -14,7 +14,7 @@ const file = name => ({ name, mimeType: 'text/plain', buffer: Buffer.from('test 
 
 try {
   for (const mobile of [false, true]) {
-    const context = await browser.newContext({ viewport: mobile ? { width: 390, height: 750 } : { width: 1440, height: 900 }, hasTouch: mobile, isMobile: mobile, serviceWorkers: 'block' });
+    const context = await browser.newContext({ viewport: mobile ? { width: 390, height: 750 } : { width: 1440, height: 900 }, hasTouch: mobile, isMobile: mobile, reducedMotion: 'no-preference', serviceWorkers: 'block' });
     const errors = [], requests = [];
     context.on('page', page => { page.setDefaultTimeout(7000); page.on('pageerror', error => errors.push(error.message)); });
     await context.route(/^https?:/, route => {
@@ -74,9 +74,21 @@ try {
       await page.mouse.move(10, 10); await page.waitForTimeout(250);
       assert.equal(await dock.locator('.companion-hints').evaluate(el => getComputedStyle(el).opacity), '0');
     }
+    await panel.evaluate(el => {
+      const animate = el.animate;
+      el.animate = function (...args) {
+        const animation = animate.apply(this, args);
+        el.openingMotion = { duration: animation.effect.getTiming().duration, frames: animation.effect.getKeyframes() };
+        el.animate = animate;
+        return animation;
+      };
+    });
     await dock.click();
     assert.equal(await panel.locator('.companion-chat-invitation').isVisible(), true);
-    assert.ok(await panel.evaluate(el => el.getAnimations().some(a => a.effect.getTiming().duration === 260)), 'Bubble opening must animate');
+    const opening = await panel.evaluate(el => el.openingMotion);
+    assert.equal(opening?.duration, 260, 'Bubble opening must animate');
+    assert.equal(Number(opening.frames[0].opacity), 0);
+    assert.equal(Number(opening.frames.at(-1).opacity), 1);
     await panel.locator('.companion-chat-invitation [data-chat-close]').click();
     assert.equal(await panel.isVisible(), false);
     await dock.click(); await panel.locator('[data-chat-guide]').click();
