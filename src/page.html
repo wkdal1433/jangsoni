@@ -13,6 +13,9 @@
 @@COMPANION_CSS@@
 @@COMPANION_CHAT_CSS@@
 </style>
+<style id="workspace-styles">
+@@WORKSPACE_CSS@@
+</style>
 
 
   <!-- 시작 화면 (기존 test.html) -->
@@ -141,7 +144,7 @@
 
   <!-- 판례 화면 (기존 03_sketch_law.html) -->
   <!-- 메뉴 화면 -->
-  <section id="menu" hidden>
+  <section id="menu" class="work-screen" hidden>
     <div class="wrap">
       <div class="law-header">
         <h1>무엇을 찾아볼까요?</h1>
@@ -152,19 +155,19 @@
       </div>
       <div id="case-summary" class="note case-summary"></div>
       <div class="menu-grid">
-        <button class="menu-item" type="button" data-go="timeline">사건 타임라인<small>날짜·이력 자동 판정 · 증빙 목록</small><span class="auto-result" id="ar-timeline"></span></button>
-        <button class="menu-item" type="button" data-go="yakgwan">약관<small>지급사유 · 지급 제한사유</small><span class="auto-result" id="ar-yakgwan"></span></button>
-        <button class="menu-item" type="button" data-go="koicd">한국표준질병사인분류(KCD)<small>KCD 9차 분류 · 코딩지침 · 코딩사례</small><span class="auto-result" id="ar-koicd"></span></button>
-        <button class="menu-item" type="button" data-go="law">판례<small>상해사망·장해·뇌혈관·암·심혈관</small><span class="auto-result" id="ar-law"></span></button>
-        <button class="menu-item" type="button" data-go="pubmed">의학 논문<small>PubMed 검색</small><span class="auto-result" id="ar-pubmed"></span></button>
-        <button class="menu-item" type="button" data-go="fss">금융감독원 분쟁조정정보<small>금감원 결정례·해결기준·사례·판례·유의사항</small><span class="auto-result" id="ar-fss"></span></button>
-        <button class="menu-item" type="button" data-go="cardnews">카드뉴스 만들기<small>6장 양식 · 바로 편집</small><span class="auto-result" id="ar-cardnews"></span></button>
+        <button class="menu-item" type="button" data-go="timeline"><span class="menu-icon" aria-hidden="true">◷</span><span class="menu-title">사건 타임라인</span><small>날짜·이력 자동 판정 · 증빙 목록</small><span class="auto-result" id="ar-timeline"></span></button>
+        <button class="menu-item" type="button" data-go="yakgwan"><span class="menu-icon" aria-hidden="true">▤</span><span class="menu-title">약관</span><small>지급사유 · 지급 제한사유</small><span class="auto-result" id="ar-yakgwan"></span></button>
+        <button class="menu-item" type="button" data-go="koicd"><span class="menu-icon" aria-hidden="true">＋</span><span class="menu-title">한국표준질병사인분류(KCD)</span><small>KCD 9차 분류 · 코딩지침 · 코딩사례</small><span class="auto-result" id="ar-koicd"></span></button>
+        <button class="menu-item" type="button" data-go="law"><span class="menu-icon" aria-hidden="true">⚖</span><span class="menu-title">판례</span><small>상해사망·장해·뇌혈관·암·심혈관</small><span class="auto-result" id="ar-law"></span></button>
+        <button class="menu-item" type="button" data-go="pubmed"><span class="menu-icon" aria-hidden="true">⌕</span><span class="menu-title">의학 논문</span><small>PubMed 검색</small><span class="auto-result" id="ar-pubmed"></span></button>
+        <button class="menu-item" type="button" data-go="fss"><span class="menu-icon" aria-hidden="true">≋</span><span class="menu-title">금융감독원 분쟁조정정보</span><small>금감원 결정례·해결기준·사례·판례·유의사항</small><span class="auto-result" id="ar-fss"></span></button>
+        <button class="menu-item" type="button" data-go="cardnews"><span class="menu-icon" aria-hidden="true">▦</span><span class="menu-title">카드뉴스 만들기</span><small>6장 양식 · 바로 편집</small><span class="auto-result" id="ar-cardnews"></span></button>
       </div>
     </div>
   </section>
 
   <!-- 약관 화면 (현대해상 공시실 > 보험상품공시) -->
-  <section id="yakgwan" hidden>
+  <section id="yakgwan" class="work-screen" hidden>
     <div class="wrap wide">
       <div class="law-header">
         <h1>약관</h1>
@@ -198,7 +201,7 @@
   </section>
 
   <!-- 금융감독원 분쟁조정정보 화면 -->
-  <section id="fss" hidden>
+  <section id="fss" class="work-screen" hidden>
     <div class="wrap wide">
       <div class="law-header">
         <h1>금융감독원 분쟁조정정보</h1>
@@ -218,7 +221,7 @@
   </section>
 
   <!-- KOICD 질병분류 정보센터 화면 -->
-  <section id="koicd" hidden>
+  <section id="koicd" class="work-screen" hidden>
     <div class="wrap wide">
       <div class="law-header">
         <h1>한국표준질병사인분류(KCD)</h1>
@@ -233,13 +236,26 @@
         <button type="submit">찾기</button>
       </form>
 
+      <aside class="search-intro">
+        <span class="search-intro-mark" aria-hidden="true">⌕</span>
+        <div>
+          <h2>진단코드나 병명으로 시작해 보세요</h2>
+          <p>예시를 누르면 검색창에 입력돼요.</p>
+          <div class="search-examples">
+            <button type="button" data-example-input="koicd-query" data-example-value="I21">I21</button>
+            <button type="button" data-example-input="koicd-query" data-example-value="뇌경색">뇌경색</button>
+          </div>
+          <p>분류명과 관련 코딩지침·코딩사례를 함께 살펴볼 수 있어요.</p>
+        </div>
+      </aside>
+
       <!-- 검색 결과 (찾기를 누르거나 처음 화면에 진단코드를 넣으면 표시) -->
       <div id="koicd-result"></div>
     </div>
   </section>
 
   <!-- 의학 논문(PubMed) 화면: PubMed는 다른 화면 안에 넣는 것을 막아 두어서 새 창으로 엶 -->
-  <section id="pubmed" hidden>
+  <section id="pubmed" class="work-screen" hidden>
     <div class="wrap">
       <div class="law-header">
         <h1>의학 논문 (PubMed)</h1>
@@ -253,11 +269,24 @@
         <button class="filter active" type="submit">PubMed에서 검색</button>
         <a class="back" href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" rel="noopener">PubMed 첫 화면 열기</a>
       </form>
+
+      <aside class="search-intro">
+        <span class="search-intro-mark" aria-hidden="true">⌕</span>
+        <div>
+          <h2>찾고 싶은 의학 용어를 입력해 보세요</h2>
+          <p>예시를 누르면 검색창에 입력돼요.</p>
+          <div class="search-examples">
+            <button type="button" data-example-input="pubmed-query" data-example-value="moyamoya disease">moyamoya disease</button>
+            <button type="button" data-example-input="pubmed-query" data-example-value="lacunar infarction">lacunar infarction</button>
+          </div>
+          <p>검색을 실행하면 PubMed 검색 결과가 새 창으로 열려요.</p>
+        </div>
+      </aside>
     </div>
   </section>
 
   <!-- 카드뉴스 만들기 화면 -->
-  <section id="cardnews" hidden>
+  <section id="cardnews" class="work-screen" hidden>
     <div class="wrap">
       <div class="law-header">
         <h1>카드뉴스 만들기</h1>
@@ -280,7 +309,7 @@
   </section>
 
   <!-- 사건 타임라인: 날짜·이력 입력 → 자동 판정 → 증빙 체크리스트 → 카드뉴스 반영 -->
-  <section id="timeline" hidden>
+  <section id="timeline" class="work-screen" hidden>
     <div class="wrap wide">
       <div class="law-header">
         <h1>사건 타임라인 · 자동 판정</h1>
@@ -367,7 +396,7 @@
   </section>
 
   <!-- 준비 중 화면 -->
-  <section id="soon" hidden>
+  <section id="soon" class="work-screen" hidden>
     <div class="wrap">
       <div class="law-header">
         <h1 id="soon-title">준비 중</h1>
@@ -377,7 +406,7 @@
     </div>
   </section>
 
-  <section id="law" hidden>
+  <section id="law" class="work-screen" hidden>
     <div class="wrap">
       <div class="law-header">
         <h1>장기 손해사정 판례</h1>
@@ -427,6 +456,10 @@
     </div>
   </section>
 
+  <div class="companion-dock" aria-hidden="true">
+    <span>장손이 도움말</span>
+    <small>오른쪽 장손이를 눌러 주세요</small>
+  </div>
   <button id="case-companion" type="button" aria-label="장손이 도움말 열기" aria-haspopup="dialog" aria-controls="companion-chat" aria-expanded="false" hidden>
     <span class="companion-art" aria-hidden="true">
       @@COMPANION_BLINK_FRAME@@

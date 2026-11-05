@@ -1,1 +1,1 @@
-export { atlas as mascotAtlas, mirrored } from 'mascot-assets';
+export { atlas as mascotAtlas } from 'mascot-assets';

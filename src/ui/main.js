@@ -4,6 +4,7 @@ import { createMascot } from './mascot.js';
 import { mascotAtlas } from './mascot-config.js';
 import { createNavigation } from './navigation.js';
 import { setupCompanion } from './companion.js';
+import { setupSearchExamples } from './search-examples.js';
 
 const root = document.getElementById('intro');
 const tour = document.getElementById('landing-tour');
@@ -21,4 +22,5 @@ export const navigate = createNavigation({
 });
 
 setupIntro(root, reduce, navigate);
+setupSearchExamples();
 setupJourney(root, tour, reduce, createMascot(root, mascotAtlas), companion.handoff);

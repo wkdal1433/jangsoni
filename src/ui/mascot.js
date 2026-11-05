@@ -1,5 +1,4 @@
 import { mountAtlas } from './sprite.js';
-import { mirrored } from './mascot-config.js';
 
 export function createMascot(root, atlas) {
  const original=root.querySelector('img.mascots-img');
@@ -16,7 +15,7 @@ export function createMascot(root, atlas) {
  if(atlas){
    const source=new Image();
    source.onload=()=>{
-     journeyAtlas=mountAtlas(avatar,source,atlas.stand,'mascot-atlas',mirrored);
+     journeyAtlas=mountAtlas(avatar,source,atlas.stand,'mascot-atlas');
      staticImg.hidden=true;
      avatar.closest('.journey-sticky').classList.add('has-mascot-atlas');
      spritesReady=true;

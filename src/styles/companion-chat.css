@@ -1,5 +1,5 @@
 html.companion-guiding { overflow: hidden; scrollbar-gutter: stable; }
-.companion-chat::backdrop { background: rgb(17 28 43 / .58); }
+.companion-chat::backdrop { background: rgb(17 28 43 / .32); }
 .companion-chat {
   --chat-inset: 18px;
   --chat-dock-gap: calc(98px + max(18px, env(safe-area-inset-bottom)));
@@ -82,7 +82,7 @@ html.companion-guiding { overflow: hidden; scrollbar-gutter: stable; }
 .companion-chat-guide { padding: 14px 16px; max-height: calc(var(--chat-viewport-height, 100dvh) + var(--chat-viewport-bottom, 0px) - var(--chat-bottom) - 70px); overflow-y: auto; overscroll-behavior: contain; }
 .companion-chat-guide h3 { margin: 0; font-size: 16px; }
 .companion-chat-guide ol { padding-left: 22px; margin: 12px 0 16px; }
-.companion-chat-guide li { margin-block: 8px; line-height: 1.7; }
+.companion-chat-guide li { margin-block: 8px; font-size: 14px; line-height: 1.7; }
 .companion-chat .companion-chat-guide-button { min-height: 32px; padding: 4px 8px; font-size: 13px; }
 .companion-chat-actions { display: flex; justify-content: flex-end; gap: 8px; }
 .companion-chat-conversation { display: flex; flex: 1; min-height: 0; flex-direction: column; }
@@ -139,7 +139,7 @@ html.companion-guiding { overflow: hidden; scrollbar-gutter: stable; }
 }
 @keyframes companion-backdrop-enter {
   from { background: rgb(17 28 43 / 0); }
-  to { background: rgb(17 28 43 / .58); }
+  to { background: rgb(17 28 43 / .32); }
 }
 @media (max-width: 720px) {
   .companion-chat { --chat-inset: 10px; --chat-dock-gap: calc(72px + max(18px, env(safe-area-inset-bottom))); }

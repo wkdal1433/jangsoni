@@ -6,36 +6,13 @@ async function imageData(file) {
   return `data:image/${extname(file).slice(1)};base64,${data.toString('base64')}`;
 }
 
-function mirroredHero(hero, image) {
-  const [width, height] = hero.size;
-  const upright = (hero.upright || []).map(([x, y, w, h], index) => `
-    <mask id="upright-${index}" maskUnits="userSpaceOnUse" x="${x}" y="${y}" width="${w}" height="${h}">
-      <rect x="${x + 4}" y="${y + 4}" width="${w - 8}" height="${h - 8}" fill="white" filter="url(#soft-edge)"/>
-    </mask>`).join('');
-  const labels = (hero.upright || []).map(([x, y, w, h], index) => `
-    <svg x="${width - x - w}" y="${y}" width="${w}" height="${h}" viewBox="${x} ${y} ${w} ${h}">
-      <use href="#hero-source" mask="url(#upright-${index})"/>
-    </svg>`).join('');
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-    <defs>
-      <image id="hero-source" href="${image}" width="${width}" height="${height}"/>
-      <filter id="soft-edge"><feGaussianBlur stdDeviation="2"/></filter>
-      ${upright}
-    </defs>
-    <use href="#hero-source" transform="translate(${width} 0) scale(-1 1)"/>
-    ${labels}
-  </svg>`;
-  return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
-}
-
-function blinkFrame(asset, image, prefix, mirrored) {
+function blinkFrame(asset, image, prefix) {
   const [width, height] = asset.size;
   const alignment = prefix === 'companion' ? 'xMidYMax meet' : 'xMidYMid meet';
-  const reflection = mirrored ? ' style="transform:scaleX(-1);transform-origin:50% 50%"' : '';
   const eyes = asset.eyes.map(([cx, cy, rx, ry]) =>
     `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#${prefix}-blink-edge)"/>`
   ).join('\n');
-  return `<svg class="${prefix}-closed-frame" aria-hidden="true" viewBox="0 0 ${width} ${height}" preserveAspectRatio="${alignment}"${reflection}>
+  return `<svg class="${prefix}-closed-frame" aria-hidden="true" viewBox="0 0 ${width} ${height}" preserveAspectRatio="${alignment}">
     <defs>
       <radialGradient id="${prefix}-blink-edge">
         <stop offset="${asset.edge}" stop-color="white"/>
@@ -64,12 +41,11 @@ export async function loadMascotAssets(root) {
 
   return {
     html: {
-      HERO_IMAGE: profile.mirrored ? mirroredHero(profile.hero, hero) : hero,
-      HERO_BLINK_FRAME: blinkFrame(profile.hero, heroBlink, 'mascot', profile.mirrored),
-      COMPANION_BLINK_FRAME: blinkFrame(profile.companion, companionBlink, 'companion', profile.mirrored),
+      HERO_IMAGE: hero,
+      HERO_BLINK_FRAME: blinkFrame(profile.hero, heroBlink, 'mascot'),
+      COMPANION_BLINK_FRAME: blinkFrame(profile.companion, companionBlink, 'companion'),
     },
     runtime: {
-      mirrored: profile.mirrored,
       atlas: { src: walk, stand: profile.journey.stand, walk: profile.journey.walk },
       companion,
     },

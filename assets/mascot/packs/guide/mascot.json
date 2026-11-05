@@ -1,5 +1,4 @@
 {
-  "mirrored": true,
   "hero": {
     "image": "hero.webp",
     "size": [
@@ -21,15 +20,7 @@
         76
       ]
     ],
-    "edge": 0.84,
-    "upright": [
-      [
-        355,
-        998,
-        260,
-        85
-      ]
-    ]
+    "edge": 0.84
   },
   "journey": {
     "image": "walk.webp",
