@@ -117,8 +117,24 @@ try {
     await panel.locator('.companion-chat-close').click();
     await page.mouse.move(10, 10);
     await page.waitForFunction(() => document.querySelector('.companion-closed-frame').getAnimations().length > 0, {}, { timeout: 7000 });
+    if (!mobile) for (const [x, y, pose, duration] of [[-70, -34, 'balance', 380], [-360, -180, 'dizzy', 300]]) {
+      const home = await dock.boundingBox();
+      await page.mouse.move(home.x + home.width / 2, home.y + home.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(home.x + home.width / 2 + x, home.y + home.height / 2 + y, { steps: 6 });
+      assert.notEqual(await dock.getAttribute('data-dragging'), null);
+      await page.mouse.up();
+      assert.equal(await dock.getAttribute('data-pose'), pose);
+      assert.equal(await dock.evaluate(el => el.getAnimations()[0]?.effect.getTiming().duration), duration);
+      await page.waitForFunction(() => document.querySelector('#case-companion').dataset.pose === 'idle');
+      const returned = await dock.boundingBox();
+      assert.ok(Math.abs(returned.x - home.x) < 1 && Math.abs(returned.y - home.y) < 1);
+      assert.equal(await panel.isVisible(), false, 'Dragging must not open chat');
+    }
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    assert.equal(await dock.locator('.companion-closed-frame').evaluate(el => getComputedStyle(el).visibility), 'hidden');
     assert.deepEqual(errors, []);
-    console.log(mobile ? 'Mobile' : 'Desktop', 'seven first guides, full dismissal, tab/reload scope, hover hints, soft chat, IME, attachments, draft, local reply and natural blink');
+    console.log(mobile ? 'Mobile' : 'Desktop', 'seven first guides, full dismissal, tab/reload scope, hover hints, soft chat, IME, attachments, draft, local reply, natural blink, motion preference and desktop short/far drag');
     await context.close();
   }
 } finally { await browser.close(); }
