@@ -12,7 +12,7 @@ function blinkFrame(asset, image, prefix) {
   const eyes = asset.eyes.map(([cx, cy, rx, ry]) =>
     `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#${prefix}-blink-edge)"/>`
   ).join('\n');
-  return `<svg class="${prefix}-closed-frame" aria-hidden="true" viewBox="0 0 ${width} ${height}" preserveAspectRatio="${alignment}">
+  return `<svg class="${prefix}-closed-frame" aria-hidden="true" viewBox="0 0 ${width} ${height}" preserveAspectRatio="${alignment}"${asset.flipX ? ' style="transform:scaleX(-1)"' : ''}>
     <defs>
       <radialGradient id="${prefix}-blink-edge">
         <stop offset="${asset.edge}" stop-color="white"/>
@@ -46,8 +46,9 @@ export async function loadMascotAssets(root) {
       COMPANION_BLINK_FRAME: blinkFrame(profile.companion, companionBlink, 'companion'),
     },
     runtime: {
-      atlas: { src: walk, stand: profile.journey.stand, walk: profile.journey.walk },
+      atlas: { src: walk, stand: profile.journey.stand, walk: profile.journey.walk, flipX: !!profile.journey.flipX },
       companion,
+      companionFlipX: !!profile.companion.flipX,
     },
   };
 }

@@ -15,7 +15,7 @@ export function createMascot(root, atlas) {
  if(atlas){
    const source=new Image();
    source.onload=()=>{
-     journeyAtlas=mountAtlas(avatar,source,atlas.stand,'mascot-atlas');
+     journeyAtlas=mountAtlas(avatar,source,atlas.stand,'mascot-atlas',atlas.flipX);
      staticImg.hidden=true;
      avatar.closest('.journey-sticky').classList.add('has-mascot-atlas');
      spritesReady=true;
