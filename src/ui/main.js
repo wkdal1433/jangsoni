@@ -12,7 +12,13 @@ const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 const companion = setupCompanion(root, tour, reduce);
 
 // The bundled entry point connects the new UI modules to the existing business script.
-export const navigate = createNavigation({ showScreen, tour, tourButton, reduce, onViewChange: companion.update });
+export const navigate = createNavigation({
+  showScreen, tour, tourButton, reduce,
+  onViewChange(screen) {
+    companion.update();
+    companion.visit(screen);
+  },
+});
 
 setupIntro(root, reduce, navigate);
 setupJourney(root, tour, reduce, createMascot(root, mascotAtlas), companion.handoff);

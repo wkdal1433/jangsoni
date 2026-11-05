@@ -10,7 +10,7 @@ const dockEase = 'cubic-bezier(.2,.75,.3,1)';
 
 export function setupCompanion(root, tour, reduce) {
   const button = document.getElementById('case-companion');
-  const chat = setupCompanionChat(button);
+  const chat = setupCompanionChat(button, reduce);
   const art = button.querySelector('.companion-art');
   const closedFrame = button.querySelector('.companion-closed-frame');
   const example = root.querySelector('.demo-section');
@@ -224,5 +224,5 @@ export function setupCompanion(root, tour, reduce) {
   scheduleIdleEffect(button, reduce, [2500, 4800], canIdle, () => blink(closedFrame));
   scheduleIdleEffect(button, reduce, [2300, 4300], canIdle, fidget);
 
-  return { update, handoff };
+  return { update, handoff, visit: chat.visit };
 }

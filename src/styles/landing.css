@@ -169,6 +169,10 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
  #intro .demo-panel { gap:44px; }
 }
 @media(max-width:720px){
+ @media(prefers-reduced-motion:no-preference){
+  html:has(#intro:not([hidden]) #landing-tour:not([hidden])):not(:has(:is(input,select,textarea,[contenteditable]):focus)) { scroll-snap-type:y proximity; scroll-padding-block-start:0; }
+  #landing-guide,#landing-journey,#intro .demo-section { scroll-snap-align:start; scroll-snap-stop:always; }
+ }
  #intro { font-size:15px; }
  #intro .landing-container { width:calc(100% - 38px); }
  #intro .landing-hero { grid-template-columns:1fr; gap:0; min-height:unset; padding-top:65px; padding-bottom:65px; }

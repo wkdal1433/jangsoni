@@ -37,7 +37,7 @@ export function createNavigation({ showScreen, tour, tourButton, reduce, onViewC
     } else if (entry.target) {
       goToTarget(entry.target);
     }
-    onViewChange();
+    onViewChange(current.screen);
   });
 
   return function navigate(screen, target) {
@@ -50,6 +50,6 @@ export function createNavigation({ showScreen, tour, tourButton, reduce, onViewC
 
     if (!target || screen !== previous.screen) showScreen(screen);
     if (target) goToTarget(target);
-    onViewChange();
+    onViewChange(current.screen);
   };
 }

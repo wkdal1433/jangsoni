@@ -119,32 +119,37 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    const direction=Math.sign(event.deltaY);
    const centers=cardCenters();
    const halfViewport=window.innerHeight/2;
-   const viewCenter=window.scrollY+halfViewport;
-   const first=centers[0], last=centers[centers.length-1];
+   const scrollTop=window.scrollY;
+   const topOf=element=>scrollTop+element.getBoundingClientRect().top;
+   const targets=[
+     {top:topOf(beforeJourney),index:null},
+     {top:topOf(journey),index:null},
+     ...centers.map((center,index)=>({top:center-halfViewport,index})),
+     {top:topOf(afterJourney),index:null},
+   ];
+   const first=targets[0].top, last=targets.at(-1).top;
    const delta=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?window.innerHeight:1);
-   if(viewCenter<first-2||viewCenter>last+2){
-     const enteringFromAbove=viewCenter<first&&viewCenter+delta>=first;
-     const enteringFromBelow=viewCenter>last&&viewCenter+delta<=last;
+   if(scrollTop<first-2||scrollTop>last+2){
+     const enteringFromAbove=scrollTop<first&&scrollTop+delta>=first;
+     const enteringFromBelow=scrollTop>last&&scrollTop+delta<=last;
      if(!enteringFromAbove&&!enteringFromBelow) return;
      event.preventDefault();
      lastWheel=now;
-     const entry=enteringFromAbove?0:centers.length-1;
      cardReaction?.cancel();
-     moveJourney(centers[entry]-halfViewport,entry);
+     moveJourney(enteringFromAbove?first:last,null);
      return;
    }
 
-   const next=nearestCard(centers,viewCenter)+direction;
+   const next=direction>0
+     ?targets.find(target=>target.top>scrollTop+2)
+     :targets.findLast(target=>target.top<scrollTop-2);
+   if(!next) return;
    event.preventDefault();
    lastWheel=now;
    cardReaction?.cancel();
-   if(next<0||next>=centers.length){
-     if(next>=centers.length) handoff(avatar,boundaryDuration);
-     const destination=(next<0?beforeJourney:afterJourney).getBoundingClientRect();
-     moveJourney(window.scrollY+(destination.top+destination.bottom)/2-halfViewport,null);
-   }else{
-     moveJourney(centers[next]-halfViewport,next,true);
-   }
+   if(direction>0&&next.top===last) handoff(avatar,boundaryDuration);
+   const walking=next.index!==null&&scrollTop>=centers[0]-halfViewport-2&&scrollTop<=centers.at(-1)-halfViewport+2;
+   moveJourney(next.top,next.index,walking);
  }
 
  const requestUpdate=()=>{if(!updateFrame) updateFrame=requestAnimationFrame(update);};

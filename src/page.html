@@ -459,6 +459,7 @@
   <section id="companion-chat" class="companion-chat" role="dialog" aria-labelledby="companion-chat-title" hidden>
     <header class="companion-chat-header">
       <h2 id="companion-chat-title">장손이 도움말</h2>
+      <button type="button" class="companion-chat-guide-button" data-chat-guide hidden>사용법</button>
       <button type="button" class="companion-chat-close" data-chat-close aria-label="채팅 닫기">×</button>
     </header>
     <div class="companion-chat-invitation">
@@ -466,6 +467,14 @@
       <div class="companion-chat-actions">
         <button type="button" data-chat-close>아니오</button>
         <button type="button" class="companion-chat-primary" data-chat-yes>예</button>
+      </div>
+    </div>
+    <div class="companion-chat-guide" hidden>
+      <h3 tabindex="-1"></h3>
+      <ol></ol>
+      <div class="companion-chat-actions">
+        <button type="button" data-guide-chat>질문하기</button>
+        <button type="button" class="companion-chat-primary" data-chat-close>확인했어요</button>
       </div>
     </div>
     <div class="companion-chat-conversation" hidden>
