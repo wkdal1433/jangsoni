@@ -24,6 +24,7 @@
 - `src/analysis.js`와 `src/data/`는 기존 업무 기능과 내장 데이터를 담습니다.
 - `src/ui/navigation.js`는 화면 이동과 브라우저 방문 기록을 관리합니다.
 - `src/ui/journey.js`와 `src/ui/mascot.js`는 둘러보기 스크롤과 장손이 포즈 표시를 나눠 맡습니다.
+- `src/ui/companion.js`는 업무 화면 오른쪽 아래의 장손이와 둘러보기에서 이어지는 이동을 담당합니다.
 - 각 비교안의 포즈는 `src/ui/mascot-config.js`에서 설정합니다. `assets/mascot/runtime/`에는 배포본에 넣는 WebP 이미지가 들어 있습니다.
 
 ```sh

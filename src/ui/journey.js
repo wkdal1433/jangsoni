@@ -1,4 +1,4 @@
-export function setupJourney(root, tour, reduce, mascot) {
+export function setupJourney(root, tour, reduce, mascot, handoff) {
  const journey=root.querySelector('#landing-journey');
  const steps=[...root.querySelectorAll('.journey-step')];
  const sentence=root.querySelector('#journey-speech');
@@ -124,6 +124,7 @@ export function setupJourney(root, tour, reduce, mascot) {
    event.preventDefault();
    lastWheel=now;
    if(next<0||next>=centers.length){
+     if(next>=centers.length) handoff(avatar,boundaryDuration);
      const destination=(next<0?beforeJourney:afterJourney).getBoundingClientRect();
      moveJourney(window.scrollY+(destination.top+destination.bottom)/2-halfViewport,null);
    }else{

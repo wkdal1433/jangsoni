@@ -1,4 +1,4 @@
-export function createNavigation({ showScreen, tour, tourButton, reduce }) {
+export function createNavigation({ showScreen, tour, tourButton, reduce, onViewChange }) {
   let nextVisit = 0;
   const newVisit = () => `${performance.timeOrigin}:${nextVisit++}`;
   let current = { visit: newVisit(), screen: 'intro' };
@@ -37,6 +37,7 @@ export function createNavigation({ showScreen, tour, tourButton, reduce }) {
     } else if (entry.target) {
       goToTarget(entry.target);
     }
+    onViewChange();
   });
 
   return function navigate(screen, target) {
@@ -49,5 +50,6 @@ export function createNavigation({ showScreen, tour, tourButton, reduce }) {
 
     if (!target || screen !== previous.screen) showScreen(screen);
     if (target) goToTarget(target);
+    onViewChange();
   };
 }

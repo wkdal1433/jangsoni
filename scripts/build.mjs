@@ -27,6 +27,7 @@ const app = await build({
 const values = Object.fromEntries(await Promise.all([
   ['BASE_CSS', readText('src/styles/base.css')],
   ['LANDING_CSS', readText('src/styles/landing.css')],
+  ['COMPANION_CSS', readText('src/styles/companion.css')],
   ['FSS_DATA', readText('src/data/fss.js')],
   ['KOICD_DATA', readText('src/data/koicd.js')],
   ['ANALYSIS_JS', readText('src/analysis.js')],
