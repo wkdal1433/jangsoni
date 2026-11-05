@@ -1,4 +1,4 @@
-import { companion as companionSource } from 'mascot-assets';
+import { companion as companionSource, companionFlipX } from 'mascot-assets';
 import { mountAtlas } from './sprite.js';
 import { blink, scheduleIdleEffect } from './idle-motion.js';
 import { setupCompanionChat } from './companion-chat.js';
@@ -215,7 +215,7 @@ export function setupCompanion(root, tour, reduce) {
   image.onload = () => {
     tileWidth = image.naturalWidth / 2;
     tileHeight = image.naturalHeight / 2;
-    sprite = mountAtlas(art, image, [0, 0, tileWidth, tileHeight], 'companion-sprite');
+    sprite = mountAtlas(art, image, [0, 0, tileWidth, tileHeight], 'companion-sprite', companionFlipX);
     setPose('idle');
     update();
   };

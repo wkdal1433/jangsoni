@@ -26,7 +26,7 @@
 - `src/ui/journey.js`와 `src/ui/mascot.js`는 둘러보기 스크롤과 장손이 포즈 표시를 나눠 맡습니다.
 - `src/ui/companion.js`는 업무 화면 오른쪽 아래의 장손이와 둘러보기에서 이어지는 이동을 담당합니다.
 - `src/mascot-assets.json`의 `pack` 경로로 수달을 선택합니다. 가이드는 `assets/mascot/packs/guide/mascot.json`, 오리지널은 `assets/mascot/packs/original/mascot.json`입니다.
-- 각 이미지 묶음의 `mascot.json`에서 이미지 경로·눈 위치·걷기 프레임 영역을 관리합니다. `scripts/mascot-assets.mjs`가 이 정보를 공통 화면과 동작에 연결합니다.
+- 각 이미지 묶음의 `mascot.json`에서 이미지 경로·눈 위치·걷기 프레임 영역을 관리합니다. 가이드의 큰 시작화면 이미지는 원래 방향을 사용하고, `journey.flipX`와 `companion.flipX`로 걷기·작은 안내 수달만 좌우반전합니다. `scripts/mascot-assets.mjs`가 이 정보를 공통 화면과 동작에 연결합니다.
 
 ```sh
 npm ci
