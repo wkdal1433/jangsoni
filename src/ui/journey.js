@@ -9,8 +9,11 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  const desktopJourney=window.matchMedia('(min-width: 721px)');
  const walkDuration=900;
  const boundaryDuration=420;
- const beforeJourney=root.querySelector("#landing-guide");
+ const welcome=root.querySelector('#landing-welcome');
+ const about=root.querySelector('#landing-about');
+ const beforeJourney=root.querySelector('#landing-guide');
  const afterJourney=root.querySelector(".demo-section");
+ const workbench=root.querySelector('#analysis-workbench');
  const wheelQuietTime=120;
  let active=-1, updateFrame=0, journeyFrame=0, lastWheel=-Infinity;
  let cardReaction;
@@ -74,9 +77,10 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    const duration=walking?walkDuration:boundaryDuration;
    const origin=window.scrollY;
    const start=performance.now();
+   const tourOpen=!tour.hidden;
    let displayedFrame=-1;
    const tick=now=>{
-     if(root.hidden||tour.hidden||reduce.matches||!desktopJourney.matches){
+     if(root.hidden||tourOpen!==!tour.hidden||reduce.matches||!desktopJourney.matches){
        stopJourneyTransition();
        return;
      }
@@ -107,7 +111,9 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  }
 
  function onJourneyWheel(event){
-   if(root.hidden||tour.hidden||!desktopJourney.matches||reduce.matches||!mascot.ready) return;
+   if(root.hidden||!desktopJourney.matches||reduce.matches||!mascot.ready) return;
+   if(document.activeElement.matches('input,select,textarea,[contenteditable]')||document.querySelector('dialog[open]')) return;
+   if(event.target.closest?.('input,select,textarea,[contenteditable],#companion-chat')) return;
    if(!event.cancelable||event.defaultPrevented||event.ctrlKey||event.shiftKey||Math.abs(event.deltaY)<=Math.abs(event.deltaX)) return;
    const now=performance.now();
    if(journeyFrame||now-lastWheel<wheelQuietTime){
@@ -121,11 +127,16 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    const halfViewport=window.innerHeight/2;
    const scrollTop=window.scrollY;
    const topOf=element=>scrollTop+element.getBoundingClientRect().top;
+   const section=element=>({top:topOf(element),index:null,section:element});
    const targets=[
-     {top:topOf(beforeJourney),index:null},
-     {top:topOf(journey),index:null},
-     ...centers.map((center,index)=>({top:center-halfViewport,index})),
-     {top:topOf(afterJourney),index:null},
+     section(welcome),
+     ...(!tour.hidden?[
+       section(about),section(beforeJourney),
+       {top:topOf(journey),index:null},
+       ...centers.map((center,index)=>({top:center-halfViewport,index})),
+       section(afterJourney),
+     ]:[]),
+     section(workbench),
    ];
    const first=targets[0].top, last=targets.at(-1).top;
    const delta=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?window.innerHeight:1);
@@ -144,16 +155,29 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
      ?targets.find(target=>target.top>scrollTop+2)
      :targets.findLast(target=>target.top<scrollTop-2);
    if(!next) return;
+   const current=targets.findLast(target=>target.top<=scrollTop+2);
+   if(current?.section){
+     const lastReadableTop=current.top+current.section.getBoundingClientRect().height-window.innerHeight;
+     if(direction>0&&scrollTop<lastReadableTop-2) return;
+     if(direction<0&&scrollTop>current.top+2) return;
+   }
    event.preventDefault();
    lastWheel=now;
    cardReaction?.cancel();
-   if(direction>0&&next.top===last) handoff(avatar,boundaryDuration);
+   if(direction>0&&next.section===afterJourney) handoff(avatar,boundaryDuration);
    const walking=next.index!==null&&scrollTop>=centers[0]-halfViewport-2&&scrollTop<=centers.at(-1)-halfViewport+2;
    moveJourney(next.top,next.index,walking);
  }
 
  const requestUpdate=()=>{if(!updateFrame) updateFrame=requestAnimationFrame(update);};
  window.addEventListener('wheel',onJourneyWheel,{passive:false});
+ document.addEventListener('click',event=>{
+   if(event.target.closest?.('[data-scroll-target],[data-preview-go],[data-go]')) stopJourneyTransition();
+ },true);
+ document.addEventListener('focusin',event=>{
+   if(event.target.matches('input,select,textarea,[contenteditable]')) stopJourneyTransition();
+ });
+ window.addEventListener('popstate',stopJourneyTransition);
  window.addEventListener('scroll',requestUpdate,{passive:true});
  window.addEventListener('resize',()=>{
    cardReaction?.cancel();

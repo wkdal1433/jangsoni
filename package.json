@@ -4,9 +4,14 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "build:check": "node scripts/build.mjs --check"
+    "build:check": "node scripts/build.mjs --check",
+    "test:scroll": "node scripts/verify-landing-scroll.mjs",
+    "test:regression": "node scripts/verify-business-regression.mjs",
+    "test:companion": "node scripts/verify-companion-regression.mjs"
   },
   "devDependencies": {
-    "esbuild": "0.28.2"
+    "esbuild": "0.28.2",
+    "html2canvas": "1.4.1",
+    "playwright-core": "1.64.1"
   }
 }

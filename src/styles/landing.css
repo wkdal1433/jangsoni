@@ -169,8 +169,8 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
 }
 @media(max-width:720px){
  @media(prefers-reduced-motion:no-preference){
-  html:has(#intro:not([hidden]) #landing-tour:not([hidden])):not(:has(:is(input,select,textarea,[contenteditable]):focus)) { scroll-snap-type:y proximity; scroll-padding-block-start:0; }
-  #landing-guide,#landing-journey,#intro .demo-section { scroll-snap-align:start; scroll-snap-stop:always; }
+  html:has(#intro:not([hidden])):not(:has(:is(input,select,textarea,[contenteditable]):focus)) { scroll-snap-type:y proximity; scroll-padding-block-start:0; }
+  #landing-welcome,#landing-about,#landing-guide,#landing-journey,#intro .demo-section,#analysis-workbench { scroll-snap-align:start; scroll-snap-stop:always; }
  }
  #intro { font-size:15px; }
  #intro .landing-container { width:calc(100% - 38px); }
