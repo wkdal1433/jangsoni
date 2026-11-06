@@ -791,7 +791,8 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
   html:has(#intro:not([hidden]) #landing-tour:not([hidden])):not(:has(:is(input,select,textarea,[contenteditable]):focus,dialog[open])) #intro:has(.has-mascot-atlas) :is(#landing-welcome,#landing-about,#landing-guide,#landing-journey,.demo-section,.journey-board,.journey-steps) { touch-action:pan-x pinch-zoom; }
   html:has(#intro:not([hidden])):not(:has(:is(input,select,textarea,[contenteditable]):focus)) { scroll-snap-type:y proximity; scroll-padding-block-start:0; }
   #landing-welcome,#landing-about,#landing-guide,#landing-journey,#intro .demo-section,#analysis-workbench { scroll-snap-align:start; scroll-snap-stop:always; }
-  html:has(#intro:not([hidden]) #landing-tour:not([hidden])):not(:has(:is(input,select,textarea,[contenteditable]):focus)) { scroll-snap-type:y mandatory; scroll-behavior:smooth; }
+  /* The mobile controller owns these destinations; native root snapping must not re-snap its result. */
+  html:has(#intro:not([hidden]) .has-mascot-atlas):has(#landing-tour:not([hidden])) { scroll-snap-type:none; scroll-behavior:auto; }
   #intro .landing-footer { scroll-snap-align:end; scroll-snap-stop:always; }
  }
  #intro { font-size:15px; }
@@ -4763,8 +4764,15 @@ var Jangsoni = (() => {
       const start = performance.now();
       const tourOpen = !tour2.hidden;
       const desktopAtStart = desktopJourney.matches;
+      let readOffset = section && atEnd ? Math.max(0, section.offsetHeight - innerHeight) : 0;
       const targetTop = () => {
-        if (section) return window.scrollY + section.getBoundingClientRect().top + (atEnd ? Math.max(0, section.offsetHeight - innerHeight) : 0);
+        if (section) {
+          if (atEnd) {
+            const currentOffset = Math.max(0, section.offsetHeight - innerHeight);
+            readOffset = destination > origin ? Math.max(readOffset, currentOffset) : Math.min(readOffset, currentOffset);
+          }
+          return window.scrollY + section.getBoundingClientRect().top + readOffset;
+        }
         if (!desktopAtStart && index !== null) return mobileCardTops()[index];
         return destination;
       };
@@ -4896,6 +4904,20 @@ var Jangsoni = (() => {
         return;
       }
       const direction = Math.sign(event.deltaY);
+      if (!desktopJourney.matches && !tour2.hidden) {
+        const scrollTop2 = window.scrollY;
+        const first2 = scrollTop2 + welcome.getBoundingClientRect().top;
+        const last2 = scrollTop2 + workbench.getBoundingClientRect().top;
+        if (scrollTop2 < first2 - 2 || scrollTop2 > last2 + 2) return;
+        const next2 = mobileDestination(direction, scrollTop2);
+        if (!next2) return;
+        event.preventDefault();
+        lastWheel = now;
+        cardReaction?.cancel();
+        if (direction > 0 && next2.section === afterJourney && !next2.atEnd) handoff(avatar, boundaryDuration);
+        moveJourney(next2.top, next2.index, next2.index !== null, next2);
+        return;
+      }
       const desktop = desktopJourney.matches;
       const centers = desktop ? cardCenters() : mobileCardTops();
       const halfViewport = desktop ? window.innerHeight / 2 : 0;
@@ -4984,9 +5006,11 @@ var Jangsoni = (() => {
       startMobileSwipe(touch.clientX, touch.clientY, event.target);
     }, { passive: true });
     window.addEventListener("touchmove", (event) => {
-      if (!mobileSwipe || mobileSwipe.pointer !== null || event.touches.length !== 1 || !event.cancelable) return;
+      if (!mobileSwipe || event.touches.length !== 1) return;
       const touch = event.touches[0];
-      if (mobileSwipe.locked || journeyFrame || chooseMobileSwipe(touch.clientX, touch.clientY)) event.preventDefault();
+      const vertical = Math.abs(mobileSwipe.y - touch.clientY) > Math.abs(mobileSwipe.x - touch.clientX);
+      if (event.cancelable && (vertical || mobileSwipe.locked || journeyFrame)) event.preventDefault();
+      if (mobileSwipe.pointer === null) chooseMobileSwipe(touch.clientX, touch.clientY);
     }, { passive: false });
     window.addEventListener("touchend", (event) => {
       mobileTouching = event.touches.length > 0;

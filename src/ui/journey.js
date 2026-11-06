@@ -189,8 +189,16 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    const start=performance.now();
    const tourOpen=!tour.hidden;
    const desktopAtStart=desktopJourney.matches;
+   // A changing viewport may extend the reading stop, but must not pull it back toward the origin.
+   let readOffset=section&&atEnd?Math.max(0,section.offsetHeight-innerHeight):0;
    const targetTop=()=>{
-     if(section) return window.scrollY+section.getBoundingClientRect().top+(atEnd?Math.max(0,section.offsetHeight-innerHeight):0);
+     if(section){
+       if(atEnd){
+         const currentOffset=Math.max(0,section.offsetHeight-innerHeight);
+         readOffset=destination>origin?Math.max(readOffset,currentOffset):Math.min(readOffset,currentOffset);
+       }
+       return window.scrollY+section.getBoundingClientRect().top+readOffset;
+     }
      if(!desktopAtStart&&index!==null) return mobileCardTops()[index];
      return destination;
    };
@@ -323,6 +331,20 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    }
 
    const direction=Math.sign(event.deltaY);
+   if(!desktopJourney.matches&&!tour.hidden){
+     const scrollTop=window.scrollY;
+     const first=scrollTop+welcome.getBoundingClientRect().top;
+     const last=scrollTop+workbench.getBoundingClientRect().top;
+     if(scrollTop<first-2||scrollTop>last+2) return;
+     const next=mobileDestination(direction,scrollTop);
+     if(!next) return;
+     event.preventDefault();
+     lastWheel=now;
+     cardReaction?.cancel();
+     if(direction>0&&next.section===afterJourney&&!next.atEnd) handoff(avatar,boundaryDuration);
+     moveJourney(next.top,next.index,next.index!==null,next);
+     return;
+   }
    const desktop=desktopJourney.matches;
    const centers=desktop?cardCenters():mobileCardTops();
    const halfViewport=desktop?window.innerHeight/2:0;
@@ -399,9 +421,12 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    startMobileSwipe(touch.clientX,touch.clientY,event.target);
  },{passive:true});
  window.addEventListener('touchmove',event=>{
-   if(!mobileSwipe||mobileSwipe.pointer!==null||event.touches.length!==1||!event.cancelable) return;
+   if(!mobileSwipe||event.touches.length!==1) return;
    const touch=event.touches[0];
-   if(mobileSwipe.locked||journeyFrame||chooseMobileSwipe(touch.clientX,touch.clientY)) event.preventDefault();
+   const vertical=Math.abs(mobileSwipe.y-touch.clientY)>Math.abs(mobileSwipe.x-touch.clientX);
+   // Cancel the native pan from its first vertical move, including pointer-backed touches.
+   if(event.cancelable&&(vertical||mobileSwipe.locked||journeyFrame)) event.preventDefault();
+   if(mobileSwipe.pointer===null) chooseMobileSwipe(touch.clientX,touch.clientY);
  },{passive:false});
  window.addEventListener('touchend',event=>{
    mobileTouching=event.touches.length>0;

@@ -71,8 +71,8 @@ try {
         assert.ok(audit.some(event => event.type === 'gotpointercapture'), 'Board must capture the gesture');
         assert.ok(audit.some(event => event.type === 'pointermove' && event.prevented));
         if (selector === 'p' && direction === 1) {
-          assert.ok(audit.some(event => event.type === 'touchmove' && event.cancelable && Math.abs(event.delta) < 18), 'Reproduce initial motion below the gesture threshold');
-          assert.ok(audit.some(event => event.type === 'touchmove' && !event.cancelable), 'Reproduce later non-cancelable legacy touch moves');
+          assert.ok(audit.some(event => event.type === 'touchmove' && event.cancelable && event.prevented && Math.abs(event.delta) < 18), 'Cancel native panning before the gesture threshold');
+          assert.ok(audit.filter(event => event.type === 'touchmove' && event.cancelable).every(event => event.prevented), 'Pointer-backed touches must also cancel native vertical moves');
         }
         await arrived(index);
       }
@@ -109,7 +109,7 @@ try {
       assert.ok(walks.every(duration => duration >= 880), 'Repeated input must retain the fixed walking duration');
     }
     assert.deepEqual(errors, []);
-    console.log(width + '×' + height + ': Chrome mouse-to-touch conversion, slow card drags both ways, pointer capture and non-cancelable legacy touch moves' + (width === 390 ? ', text/title/tags/link, all seven cards, jitter/horizontal/cancel, rapid re-drag, overflow, taps and feature navigation' : ', text/link'));
+    console.log(width + '×' + height + ': Chrome mouse-to-touch conversion, slow card drags both ways, pointer capture and native pan cancelled before the threshold' + (width === 390 ? ', text/title/tags/link, all seven cards, jitter/horizontal/cancel, rapid re-drag, overflow, taps and feature navigation' : ', text/link'));
     await page.close();
   }
 } finally {

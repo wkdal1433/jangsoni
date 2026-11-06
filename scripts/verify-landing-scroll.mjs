@@ -157,14 +157,16 @@ try {
     const { page, errors } = await open({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
     if (expanded) await tour(page);
     const route = await targets(page, false);
-    for (const target of [...route.slice(1), ...route.slice(0, -1).reverse()]) {
+    if (expanded) {
+      assert.equal(await page.evaluate(() => getComputedStyle(document.documentElement).scrollSnapType), 'none', 'The mobile controller must not compete with native root snapping');
+    } else for (const target of [...route.slice(1), ...route.slice(0, -1).reverse()]) {
       await page.evaluate(top => scrollTo({ top: Math.max(0, top - 18), behavior: 'instant' }), target.top);
       await page.waitForFunction(top => Math.abs(scrollY - top) < 2, target.top);
     }
     await page.locator('#in-code').evaluate(el => el.focus({ preventScroll: true }));
     assert.equal(await page.evaluate(() => getComputedStyle(document.documentElement).scrollSnapType), 'none');
     assert.deepEqual(errors, []);
-    console.log('Mobile:', route.map(target => target.name).join(' ↔ '), 'native section snapping and input exception');
+    console.log('Mobile:', route.map(target => target.name).join(' ↔ '), expanded ? 'controller owns root positioning (gesture paths covered by test:mobile-flow), input exception' : 'native section snapping and input exception');
     await page.close();
   }
 

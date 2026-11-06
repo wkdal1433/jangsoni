@@ -13,7 +13,8 @@
     "test:mobile-devtools": "node scripts/verify-mobile-devtools.mjs",
     "test:mobile-polish": "node scripts/verify-mobile-polish.mjs",
     "test:hero": "node scripts/verify-hero-continuity.mjs",
-    "test:mobile-flow": "node scripts/verify-mobile-flow.mjs"
+    "test:mobile-flow": "node scripts/verify-mobile-flow.mjs",
+    "test:responsive": "node scripts/verify-responsive-scroll.mjs"
   },
   "devDependencies": {
     "esbuild": "0.28.2",
