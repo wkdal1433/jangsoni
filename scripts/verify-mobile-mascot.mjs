@@ -89,12 +89,14 @@ try {
       await page.waitForTimeout(90);
       const moving = await page.evaluate(() => scrollY);
       assert.ok(moving > Math.min(origin, destination) + 1 && moving < Math.max(origin, destination) - 1, 'Card transition must animate');
-      const walking = new Set();
-      for (let i = 0; i < 4; i++) {
-        walking.add(await page.locator('.mascot-atlas').getAttribute('viewBox'));
-        await page.waitForTimeout(85);
-      }
-      assert.ok(walking.size >= 3, 'A snapped card transition must play real walking frames');
+      const walking = await page.evaluate(() => new Promise(resolve => {
+        const actor = document.querySelector('.mascot-atlas');
+        const frames = new Set([actor.getAttribute('viewBox')]);
+        const observer = new MutationObserver(() => frames.add(actor.getAttribute('viewBox')));
+        observer.observe(actor, { attributes: true, attributeFilter: ['viewBox'] });
+        setTimeout(() => { observer.disconnect(); resolve([...frames]); }, 340);
+      }));
+      assert.ok(walking.length >= 3, 'Card ' + index + ' must play real walking frames: ' + JSON.stringify(walking));
       if (hammer) await swipe(-direction);
       await page.waitForFunction(top => Math.abs(scrollY - top) < 2, destination);
       assert.ok(performance.now() - started >= 790, 'Card travel must keep its fixed walking duration');
