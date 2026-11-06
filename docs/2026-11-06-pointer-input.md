@@ -11,14 +11,14 @@
 
 - `src/ui/journey.js`의 기존 카드 입력은 `touchstart`/`touchmove`/`touchend`에 연결되어 있었다.
 - `startMobileSwipe()`/`chooseMobileSwipe()`/`finishMobileSwipe()`가 좌표·방향·목적지·전환 잠금을 함께 처리한다. 실제 터치는 기존 Touch Events 경로를 유지하고, PC 마우스 끌기는 Pointer Events로 이 공통 처리를 호출한다.
-- 마우스는 카드 영역에서 세로 끌기가 확인되면 포인터를 잡아 카드 밖에서 놓아도 완료한다. 끌기가 끝난 뒤 생기는 클릭은 기능 실행으로 처리하지 않는다. 다음 누름과 키보드 클릭은 정상 처리한다.
+- 마우스는 카드 영역에서 세로 끌기가 확인되면 [setPointerCapture()](https://developer.mozilla.org/en-US/docs/Web/API/Element/setPointerCapture)로 포인터를 잡아 카드 밖에서 놓아도 완료한다. 끌기가 끝난 뒤 생기는 클릭은 기능 실행으로 처리하지 않는다. 다음 누름에서 억제 상태를 초기화하고 `detail:0` 클릭은 이 억제 조건에서 제외한다.
 - 초점 이탈·취소·크기 변경·화면 이동 때 잡기를 정리한다. 모션 감소 설정의 마우스 끌기는 걸음 없이 바로 다음 카드로 이동한다.
 - `src/styles/landing.css`의 모바일 보드에 grab/grabbing 표시와 선택 방지를 적용했다. 업무 입력 화면은 이 범위에 포함하지 않는다.
 
 ## 걷기: 확정 사실
 
-- `src/ui/sprite.js`의 `mountAtlas()`는 가이드에 `scaleX(-1)`을 적용한다. `src/ui/mascot.js`의 `showJourneyPose()`는 전달받은 인덱스의 `atlas.walk`를 그대로 읽는다.
-- 가이드의 걷기 프레임은 5개다. `showWalkProgress()`는 `floor(progress * 1.5 * frameCount) % frameCount`로 재생하고, 종료 시 `stopJourneyTransition()`이 기본 자세로 바꾼다.
+- `src/ui/sprite.js:10`의 `mountAtlas()`는 가이드에 `scaleX(-1)`을 적용한다. `src/ui/mascot.js:32`의 `showJourneyPose()`는 전달받은 인덱스의 `atlas.walk`를 그대로 읽는다.
+- 가이드의 걷기 프레임은 5개다. `src/ui/journey.js:129`의 `showWalkProgress()`는 `floor(progress * 1.5 * frameCount) % frameCount`로 재생하고, 종료 시 같은 파일의 `stopJourneyTransition():156`이 기본 자세로 바꾼다.
 - 브라우저에서 관찰한 중복 제외 인덱스는 모바일과 데스크톱 모두 `0 → 1 → 2 → 3 → 4 → 0 → 1 → 2 → 정지`였다. 모바일은 마지막 2번 포즈가 관찰된 뒤 약 57ms 후 정지로 바뀌었고, 데스크톱은 약 56ms 후 바뀌었다.
 - 이번 수정에서 이미지·프레임 순서·좌우반전 설정은 변경하지 않았다.
 
@@ -36,4 +36,10 @@
 - `test:mobile-mascot`: 390×844·360×640·320×568의 기존 손가락 터치 경로와 캐릭터 동작을 검사한다.
 - `test:scroll`, `test:companion`, `test:regression`으로 기존 스냅·첫 안내/채팅·잡기 및 원본 업무 동작/입력을 검사한다.
 
-브랜치별 최종 결과는 검증 완료 후 기록한다. 업무 코드·데이터·이미지·팩 선택 설정은 작업 시작 커밋 대비 변경하지 않았다.
+| 브랜치 | PC 마우스 2개 크기 | 손가락 터치 3개 크기 | 기존 스크롤 | 안내/채팅/잡기 | main 업무 대조 |
+|---|---|---|---|---|---|
+| `v2-hyundai-style` | 통과 | 통과 | 통과 | 통과 | 통과 |
+| `v2-mascot-guide` | 통과 | 통과 | 통과 | 통과 | 통과 |
+| `v2-mascot-original` | 통과 | 통과 | 통과 | 통과 | 통과 |
+
+세 브랜치에서 5개 검사를 실행했다. 업무 대조의 입력/편집 106개, 원본 함수 80개와 연결 36개, 두 내장 데이터 묶음 검사를 포함한다. 업무 코드·데이터·이미지·팩 선택 설정은 작업 시작 커밋 대비 변경하지 않았다. 새 안내선 시안과 새로운 캐릭터 동작은 제품에 반영하지 않았다.
