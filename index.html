@@ -635,6 +635,8 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
 #intro .journey-heading .section-heading { margin-top:23px; }
 #intro .journey-heading .section-desc { margin-top:21px; }
 #intro .journey-grid { display:grid; grid-template-columns:37% 63%; align-items:start; gap:0; position:relative; margin-top:40px; }
+#intro .journey-board { display:contents; }
+#intro .journey-scroll-track { display:none; }
 #intro .journey-rail { position:relative; height:100%; }
 #intro .journey-sticky { position:sticky; top:calc((100svh - 430px) / 2); height:430px; display:flex; align-items:center; flex-direction:column; justify-content:flex-end; }
 #intro .journey-mascot-wrap { width:min(310px,90%); position:relative; transform-origin:50% 87%; }
@@ -667,6 +669,8 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
 #intro .step-id { color:#82a5c4; font-weight:900; font-size:13px; letter-spacing:.14em; }
 #intro .step-symbol { font-size:26px; display:grid; place-items:center; width:58px; height:58px; border-radius:18px; background:#eff6fb; color:var(--js-blue); }
 #intro .journey-card h3 { font-weight:850; letter-spacing:-.045em; font-size:clamp(27px,2.4vw,35px); margin-top:29px; }
+#intro .step-toggle { display:block; width:100%; border:0; padding:0; background:none; color:inherit; text-align:inherit; font:inherit; letter-spacing:inherit; opacity:1; }
+#intro .step-toggle:disabled { cursor:inherit; }
 #intro .journey-card p { font-size:16px; line-height:1.85; color:#708094; margin-top:15px; word-break:keep-all; }
 #intro .step-features { margin-top:22px; display:flex; gap:8px; flex-wrap:wrap; }
 #intro .step-features span { font-size:12px; font-weight:800; color:#5e819e; padding:7px 11px; border-radius:9px; background:#f0f7fb; }
@@ -736,6 +740,7 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
 @media(max-width:720px){
  @media(prefers-reduced-motion:no-preference){
   html[data-journey-transition] { scroll-snap-type:none!important; scroll-behavior:auto!important; }
+  #intro .journey-board:has(.has-mascot-atlas),#intro .journey-board:has(.has-mascot-atlas) .journey-steps { touch-action:pan-x pinch-zoom; }
   html:has(#intro:not([hidden])):not(:has(:is(input,select,textarea,[contenteditable]):focus)) { scroll-snap-type:y proximity; scroll-padding-block-start:0; }
   #landing-welcome,#landing-about,#landing-guide,#landing-journey,#intro .demo-section,#analysis-workbench { scroll-snap-align:start; scroll-snap-stop:always; }
   html:has(#intro:not([hidden]) #landing-tour:not([hidden])):not(:has(:is(input,select,textarea,[contenteditable]):focus)) { scroll-snap-type:y mandatory; scroll-behavior:smooth; }
@@ -767,21 +772,35 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
  #intro .guide-fields { gap:8px; }
  #intro .guide-field { font-size:13px; min-height:62px; padding:8px 10px; }
  #intro .journey-heading { margin-bottom:35px; }
- #intro .journey-grid { display:grid; grid-template-columns:minmax(0,1fr); grid-template-areas:"cards"; margin-top:0; }
- #intro .journey-rail { grid-area:cards; height:auto; position:relative; align-self:stretch; z-index:3; pointer-events:none; }
- #intro .journey-sticky { position:sticky; top:0; height:152px; flex-direction:row; gap:16px; justify-content:center; align-items:center; background:var(--journey-stage-color,#fff); border-radius:0 0 14px 14px; }
- #intro .journey-mascot-wrap { order:1; width:113px; flex:none; }
+ #intro .journey-grid { display:grid; grid-template-columns:minmax(0,1fr); grid-template-areas:"board"; margin-top:0; }
+ #intro .journey-board { grid-area:board; position:sticky; top:0; align-self:start; z-index:2; display:flex; flex-direction:column; max-height:100svh; padding-bottom:12px; background:var(--journey-stage-color,#fff); }
+ #intro .journey-scroll-track { display:block; grid-area:board; pointer-events:none; }
+ #intro .journey-snap-point { height:clamp(280px,65svh,600px); scroll-snap-align:start; scroll-snap-stop:always; }
+ #intro .journey-snap-point:last-child { height:100svh; }
+ #intro .journey-rail { height:auto; flex:none; pointer-events:none; }
+ #intro .journey-sticky { position:relative; top:0; height:clamp(88px,15svh,128px); display:grid; grid-template-columns:minmax(0,1fr) clamp(84px,14svh,116px); gap:16px; align-items:center; padding-inline:12px; background:var(--journey-stage-color,#fff); }
+ #intro .journey-mascot-wrap { grid-column:2; grid-row:1; width:100%; height:calc(clamp(88px,15svh,128px) - 10px); display:grid; place-items:center; }
+ #intro .journey-mascot-wrap :is(img,.mascot-atlas) { width:100%; height:100%; object-fit:contain; }
  #intro .journey-shadow { display:none; }
- #intro .journey-speech { order:0; position:relative; inset:auto; transform:none; margin:0; font-size:13px; max-width:180px; }
+ #intro .journey-speech { grid-column:1; grid-row:1; justify-self:end; position:relative; inset:auto; transform:none; margin:0; font-size:13px; max-width:100%; }
  #intro .journey-speech::after { left:auto; right:-7px; bottom:auto; top:50%; transform:translateY(-50%) rotate(-45deg); }
  #intro .journey-progress { display:none; }
- #intro .journey-steps { grid-area:cards; margin-top:0; padding-top:152px; }
- #intro .journey-step { min-height:auto; padding:12px 0; scroll-snap-align:start; scroll-snap-stop:always; scroll-margin-top:152px; }
- #intro .journey-card { border-radius:20px; opacity:1; transform:none; padding:24px 22px; }
- #intro .journey-step.is-active .journey-card { box-shadow:0 10px 32px rgba(47,109,181,.09); transform:none; }
- #intro .journey-card h3 { font-size:27px; margin-top:20px; }
- #intro .journey-card p { font-size:14px; }
- #intro .step-symbol { width:49px; height:49px; font-size:21px; }
+ #intro .journey-steps { display:flex; flex-direction:column; gap:clamp(5px,1svh,8px); margin:0; padding:0; min-height:0; overflow-y:auto; }
+ #intro .journey-step { flex:none; min-height:0; padding:0; }
+ #intro .journey-step .journey-card { border:1px solid transparent; border-radius:12px; opacity:1; transform:none; padding:0; background:#f3f3f3; box-shadow:none; transition:background-color 360ms ease,border-color 360ms ease; }
+ #intro .journey-step .journey-card::before,#intro .journey-card .step-top { display:none; }
+ #intro .journey-board .journey-step.is-active .journey-card { background:#fff; border-color:#ffba86; box-shadow:none; transform:none; }
+ #intro .journey-card h3 { font-size:17px; margin:0; }
+ #intro .step-toggle { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:clamp(40px,6.5svh,54px); padding:8px 18px; line-height:1.35; font-weight:800; }
+ #intro .step-toggle::after { content:"+"; color:#929292; font-size:21px; font-weight:400; }
+ #intro .step-toggle[aria-expanded="true"]::after { content:"−"; color:#c95c17; }
+ #intro .step-detail { display:grid; grid-template-rows:0fr; opacity:0; visibility:hidden; transition:grid-template-rows 360ms var(--js-motion-ease),opacity 260ms ease,visibility 360ms; }
+ #intro .step-detail-inner { min-height:0; overflow:hidden; }
+ #intro .journey-step.is-active .step-detail { grid-template-rows:1fr; opacity:1; visibility:visible; }
+ #intro .journey-card p { font-size:13px; line-height:1.7; min-height:45px; margin:0 18px; color:#5e6267; }
+ #intro .step-features { margin:8px 18px 0; gap:6px; }
+ #intro .step-features span { font-size:10px; padding:4px 7px; background:#fff5ed; color:#a95924; }
+ #intro .step-open { margin:6px 18px 12px; padding:6px 0; font-size:12px; background:transparent; color:#ba5014; border-bottom-color:#e9a36f; }
  #intro .demo-paper { padding:21px 17px; }
  #intro .demo-line { grid-template-columns:80px 1fr; font-size:13px; }
  #intro .workbench-card { padding:23px 20px; border-radius:22px; }
@@ -789,6 +808,11 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
  #intro .workbench-bottom { display:block; }
  #intro #start { margin-top:22px; width:100%; }
  #intro .landing-footer { flex-direction:column; align-items:flex-start; gap:12px; }
+ @media(max-height:600px){
+  #intro .journey-board { padding-bottom:8px; }
+  #intro .journey-sticky { height:76px; }
+  #intro .journey-mascot-wrap { height:70px; }
+ }
 }
 @media(prefers-reduced-motion:reduce){
  #intro *,#intro *:before,#intro *:after { animation-duration:.001ms!important; animation-iteration-count:1!important; scroll-behavior:auto!important; transition-duration:.001ms!important; }
@@ -1296,6 +1320,7 @@ html.companion-guiding { overflow: hidden; scrollbar-gutter: stable; }
     <section class="journey-section journey-cards-left" id="landing-journey"><div class="landing-container">
       <div class="journey-heading landing-reveal"><span class="section-eyebrow">EXPLORE WITH JANGSONI</span><h2 class="section-heading">장손이와 함께<br>하나씩 둘러볼까요?</h2><p class="section-desc">사건을 입력하기 전에도 각 기능을 열어볼 수 있어요. 사건 정보를 입력했다면 그 내용으로 자료를 찾아요.</p></div>
       <div class="journey-grid">
+        <div class="journey-board">
         <aside class="journey-rail" aria-label="현재 안내 단계"><div class="journey-sticky">
           <div class="journey-mascot-wrap" aria-hidden="true"><img id="journey-static-frame" data-mascot-clone alt=""><img id="journey-walk-frame" alt="" hidden></div>
           <div class="journey-shadow" aria-hidden="true"></div><div class="journey-speech" id="journey-speech" aria-live="off">여기부터 살펴볼게요.</div>
@@ -1303,39 +1328,41 @@ html.companion-guiding { overflow: hidden; scrollbar-gutter: stable; }
         </div></aside>
         <div class="journey-steps"><article class="journey-step is-active" data-step="0" aria-current="step">
   <div class="journey-card"><div class="step-top"><span class="step-id">STEP 01 / 07</span><span class="step-symbol" aria-hidden="true">◷</span></div>
-  <h3>사건 타임라인</h3><p>중요한 날짜와 진료 이력을 따라 사건의 흐름을 정리합니다.</p><div class="step-features"><span>날짜·이력</span><span>규칙 기반 검토</span></div>
-  <button class="step-open" type="button" data-preview-go="timeline">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+  <h3><button class="step-toggle" type="button" aria-expanded="true" aria-controls="journey-detail-0">사건 타임라인</button></h3><div class="step-detail" id="journey-detail-0"><div class="step-detail-inner"><p>중요한 날짜와 진료 이력을 따라 사건의 흐름을 정리합니다.</p><div class="step-features"><span>날짜·이력</span><span>규칙 기반 검토</span></div>
+  <button class="step-open" type="button" data-preview-go="timeline">기능 열어보기 <span aria-hidden="true">↗</span></button></div></div></div>
 </article>
 <article class="journey-step" data-step="1">
   <div class="journey-card"><div class="step-top"><span class="step-id">STEP 02 / 07</span><span class="step-symbol" aria-hidden="true">▤</span></div>
-  <h3>보험 약관</h3><p>가입 당시 상품 약관과 담보별 지급사유·제한사유를 검토합니다.</p><div class="step-features"><span>상품별 약관</span><span>담보 확인</span></div>
-  <button class="step-open" type="button" data-preview-go="yakgwan">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+  <h3><button class="step-toggle" type="button" aria-expanded="false" aria-controls="journey-detail-1">보험 약관</button></h3><div class="step-detail" id="journey-detail-1"><div class="step-detail-inner"><p>가입 당시 상품 약관과 담보별 지급사유·제한사유를 검토합니다.</p><div class="step-features"><span>상품별 약관</span><span>담보 확인</span></div>
+  <button class="step-open" type="button" data-preview-go="yakgwan">기능 열어보기 <span aria-hidden="true">↗</span></button></div></div></div>
 </article>
 <article class="journey-step" data-step="2">
   <div class="journey-card"><div class="step-top"><span class="step-id">STEP 03 / 07</span><span class="step-symbol" aria-hidden="true">＋</span></div>
-  <h3>KCD 진단코드</h3><p>질병분류 코드와 코딩지침, 관련 사례를 한곳에서 살펴봅니다.</p><div class="step-features"><span>KCD 검색</span><span>코딩지침</span></div>
-  <button class="step-open" type="button" data-preview-go="koicd">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+  <h3><button class="step-toggle" type="button" aria-expanded="false" aria-controls="journey-detail-2">KCD 진단코드</button></h3><div class="step-detail" id="journey-detail-2"><div class="step-detail-inner"><p>질병분류 코드와 코딩지침, 관련 사례를 한곳에서 살펴봅니다.</p><div class="step-features"><span>KCD 검색</span><span>코딩지침</span></div>
+  <button class="step-open" type="button" data-preview-go="koicd">기능 열어보기 <span aria-hidden="true">↗</span></button></div></div></div>
 </article>
 <article class="journey-step" data-step="3">
   <div class="journey-card"><div class="step-top"><span class="step-id">STEP 04 / 07</span><span class="step-symbol" aria-hidden="true">⚖</span></div>
-  <h3>판례 검색</h3><p>관련 법률 판례에서 주요 쟁점과 판단 근거를 확인합니다.</p><div class="step-features"><span>쟁점별 판례</span><span>법적 근거</span></div>
-  <button class="step-open" type="button" data-preview-go="law">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+  <h3><button class="step-toggle" type="button" aria-expanded="false" aria-controls="journey-detail-3">판례 검색</button></h3><div class="step-detail" id="journey-detail-3"><div class="step-detail-inner"><p>관련 법률 판례에서 주요 쟁점과 판단 근거를 확인합니다.</p><div class="step-features"><span>쟁점별 판례</span><span>법적 근거</span></div>
+  <button class="step-open" type="button" data-preview-go="law">기능 열어보기 <span aria-hidden="true">↗</span></button></div></div></div>
 </article>
 <article class="journey-step" data-step="4">
   <div class="journey-card"><div class="step-top"><span class="step-id">STEP 05 / 07</span><span class="step-symbol" aria-hidden="true">⌕</span></div>
-  <h3>의학 논문</h3><p>PubMed에서 진단명과 의학적 근거를 연결해 찾아봅니다.</p><div class="step-features"><span>PubMed</span><span>의학 근거</span></div>
-  <button class="step-open" type="button" data-preview-go="pubmed">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+  <h3><button class="step-toggle" type="button" aria-expanded="false" aria-controls="journey-detail-4">의학 논문</button></h3><div class="step-detail" id="journey-detail-4"><div class="step-detail-inner"><p>PubMed에서 진단명과 의학적 근거를 연결해 찾아봅니다.</p><div class="step-features"><span>PubMed</span><span>의학 근거</span></div>
+  <button class="step-open" type="button" data-preview-go="pubmed">기능 열어보기 <span aria-hidden="true">↗</span></button></div></div></div>
 </article>
 <article class="journey-step" data-step="5">
   <div class="journey-card"><div class="step-top"><span class="step-id">STEP 06 / 07</span><span class="step-symbol" aria-hidden="true">≋</span></div>
-  <h3>금감원 분쟁조정</h3><p>분쟁조정 결정례와 사례를 함께 검토합니다.</p><div class="step-features"><span>결정례</span><span>금감원 사례</span></div>
-  <button class="step-open" type="button" data-preview-go="fss">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+  <h3><button class="step-toggle" type="button" aria-expanded="false" aria-controls="journey-detail-5">금감원 분쟁조정</button></h3><div class="step-detail" id="journey-detail-5"><div class="step-detail-inner"><p>분쟁조정 결정례와 사례를 함께 검토합니다.</p><div class="step-features"><span>결정례</span><span>금감원 사례</span></div>
+  <button class="step-open" type="button" data-preview-go="fss">기능 열어보기 <span aria-hidden="true">↗</span></button></div></div></div>
 </article>
 <article class="journey-step" data-step="6">
   <div class="journey-card"><div class="step-top"><span class="step-id">STEP 07 / 07</span><span class="step-symbol" aria-hidden="true">▦</span></div>
-  <h3>카드뉴스 제작</h3><p>검토한 내용을 이해하기 쉬운 카드뉴스 형태로 정리합니다.</p><div class="step-features"><span>자료 작성</span><span>결과물 편집</span></div>
-  <button class="step-open" type="button" data-preview-go="cardnews">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+  <h3><button class="step-toggle" type="button" aria-expanded="false" aria-controls="journey-detail-6">카드뉴스 제작</button></h3><div class="step-detail" id="journey-detail-6"><div class="step-detail-inner"><p>검토한 내용을 이해하기 쉬운 카드뉴스 형태로 정리합니다.</p><div class="step-features"><span>자료 작성</span><span>결과물 편집</span></div>
+  <button class="step-open" type="button" data-preview-go="cardnews">기능 열어보기 <span aria-hidden="true">↗</span></button></div></div></div>
 </article></div>
+        </div>
+        <div class="journey-scroll-track" aria-hidden="true"></div>
       </div>
     </div></section>
     <section class="demo-section"><div class="landing-container demo-panel">
@@ -4303,6 +4330,13 @@ var Jangsoni = (() => {
     const counter = root2.querySelector("#journey-counter");
     const bar = root2.querySelector("#journey-progress-bar");
     const stage = root2.querySelector(".journey-sticky");
+    const scrollTrack = root2.querySelector(".journey-scroll-track");
+    const snapPoints = steps.map(() => {
+      const point = document.createElement("div");
+      point.className = "journey-snap-point";
+      scrollTrack.append(point);
+      return point;
+    });
     const phrases = ["\uC5EC\uAE30\uBD80\uD130 \uC0B4\uD3B4\uBCFC\uAC8C\uC694.", "\uC57D\uAD00\uB3C4 \uD655\uC778\uD574 \uBD10\uC694.", "\uCF54\uB4DC\uB3C4 \uCC3E\uC544\uBCFC\uAE4C\uC694?", "\uD310\uB840\uB294 \uC774\uCABD\uC774\uC5D0\uC694.", "\uB17C\uBB38\uB3C4 \uAC19\uC774 \uBD10\uC694.", "\uC74C\u2026 \uC774\uAC83\uB3C4 \uC911\uC694\uD574\uC694.", "\uC774\uC81C \uC815\uB9AC\uD574 \uBCFC\uAE4C\uC694?"];
     const { avatar, frameCount, showJourneyPose } = mascot;
     const desktopJourney = window.matchMedia("(min-width: 721px)");
@@ -4319,6 +4353,7 @@ var Jangsoni = (() => {
     let lastMobileScroll = window.scrollY;
     let mobileEntryTimer = 0, mobileEntryPending = false, mobileTouching = false;
     let mobileSwipe = null;
+    let revealTimer = 0;
     let cardReaction;
     function cancelMobileEntry() {
       clearTimeout(mobileEntryTimer);
@@ -4337,11 +4372,21 @@ var Jangsoni = (() => {
       stage.style.setProperty("--speech-left", avatar.offsetLeft + avatar.offsetWidth / 2 + "px");
       stage.style.setProperty("--speech-top", avatar.offsetTop - 12 + "px");
     }
+    function syncDetails() {
+      steps.forEach((step, index) => {
+        const expanded = desktopJourney.matches || index === Math.max(active, 0);
+        const toggle = step.querySelector(".step-toggle");
+        toggle.disabled = desktopJourney.matches;
+        toggle.setAttribute("aria-expanded", String(expanded));
+        step.querySelector(".step-detail").inert = !expanded;
+      });
+    }
     if ("ResizeObserver" in window) {
       const observer = new ResizeObserver(positionSpeech);
       observer.observe(avatar);
       observer.observe(stage);
     }
+    syncDetails();
     function setActive(index) {
       if (index === active) return;
       active = index;
@@ -4351,15 +4396,29 @@ var Jangsoni = (() => {
         if (on) step.setAttribute("aria-current", "step");
         else step.removeAttribute("aria-current");
       });
+      syncDetails();
+      clearTimeout(revealTimer);
+      if (!desktopJourney.matches) revealTimer = setTimeout(() => revealCard(index), reduce2.matches ? 0 : 360);
       if (sentence) sentence.textContent = phrases[index];
       if (counter) counter.textContent = String(index + 1).padStart(2, "0") + " / 07";
       if (bar) bar.style.width = (index + 1) / steps.length * 100 + "%";
+    }
+    function revealCard(index) {
+      if (root2.hidden || tour2.hidden || desktopJourney.matches) return;
+      const list = steps[index].parentElement;
+      const card = steps[index].getBoundingClientRect();
+      const viewport = list.getBoundingClientRect();
+      const offset = card.top < viewport.top ? card.top - viewport.top : Math.max(0, card.bottom - viewport.bottom);
+      if (offset) list.scrollBy({ top: offset, behavior: reduce2.matches ? "instant" : "smooth" });
     }
     function cardCenters() {
       return steps.map((step) => {
         const rect = step.getBoundingClientRect();
         return window.scrollY + (rect.top + rect.bottom) / 2;
       });
+    }
+    function mobileCardTops() {
+      return snapPoints.map((point) => window.scrollY + point.getBoundingClientRect().top);
     }
     function nearestCard(centers, viewportCenter) {
       return centers.reduce((nearest, center, i) => {
@@ -4382,8 +4441,7 @@ var Jangsoni = (() => {
           mobileEntryTimer = setTimeout(finishMobileEntry, 120);
         }
       }
-      const focusLine = desktopJourney.matches ? viewport / 2 : (viewport + stage.getBoundingClientRect().height) / 2;
-      setActive(nearestCard(cardCenters(), window.scrollY + focusLine));
+      setActive(desktopJourney.matches ? nearestCard(cardCenters(), window.scrollY + viewport / 2) : nearestCard(mobileCardTops(), window.scrollY));
       positionSpeech();
       if (!desktopJourney.matches && mobileMoved && Math.abs(stage.getBoundingClientRect().top) < 2) playMobileWalk();
     }
@@ -4391,7 +4449,8 @@ var Jangsoni = (() => {
       const gait = Math.floor(progress * 1.5 * frameCount) % frameCount;
       showJourneyPose(gait);
       const lift = Math.sin(progress * 3 * Math.PI);
-      avatar.style.transform = "translateY(" + -5 * lift * lift + "px)";
+      const amplitude = desktopJourney.matches ? 5 : 1.2 * Math.sin(progress * Math.PI);
+      avatar.style.transform = "translateY(" + -amplitude * lift * lift + "px)";
     }
     function playMobileWalk() {
       if (mobileWalkFrame || reduce2.matches || !mascot.ready) return;
@@ -4420,8 +4479,10 @@ var Jangsoni = (() => {
       journeyFrame = 0;
       showJourneyPose(-1);
       avatar.style.transform = "";
+      lastMobileScroll = window.scrollY;
     }
     function reactToCard(index) {
+      if (!desktopJourney.matches) return;
       const card = steps[index].querySelector(".journey-card").getBoundingClientRect();
       const actor = avatar.getBoundingClientRect();
       const towardCard = Math.sign(card.left + card.width / 2 - actor.left - actor.width / 2);
@@ -4464,20 +4525,17 @@ var Jangsoni = (() => {
     function mobileDestination(direction, scrollTop) {
       const topOf = (element) => window.scrollY + element.getBoundingClientRect().top;
       const start = topOf(journey), end = topOf(afterJourney);
-      if (scrollTop < start - 2 || scrollTop > end + 2) return;
-      const header = stage.getBoundingClientRect().height;
+      if (scrollTop > end + 2) return;
+      if (scrollTop < start - 2) {
+        if (journey.getBoundingClientRect().top >= innerHeight) return;
+        return { top: direction > 0 ? start : topOf(beforeJourney) + Math.max(0, beforeJourney.offsetHeight - innerHeight), index: null };
+      }
       const targets = [
         { top: topOf(beforeJourney) + Math.max(0, beforeJourney.offsetHeight - innerHeight), index: null },
         { top: start, index: null },
-        ...steps.map((step, index) => ({ top: topOf(step) - header, index, section: step })),
-        { top: end, index: null }
+        ...mobileCardTops().map((top, index) => ({ top, index })),
+        { top: end, index: null, section: afterJourney }
       ];
-      const current = targets.findLast((target) => target.top <= scrollTop + 2);
-      if (current?.section) {
-        const lastReadableTop = topOf(current.section) + current.section.offsetHeight - innerHeight;
-        if (direction > 0 && scrollTop < lastReadableTop - 2) return;
-        if (direction < 0 && scrollTop > current.top + 2) return;
-      }
       return direction > 0 ? targets.find((target) => target.top > scrollTop + 2) : targets.findLast((target) => target.top < scrollTop - 2);
     }
     function onMobileTouchStart(event) {
@@ -4486,7 +4544,8 @@ var Jangsoni = (() => {
       mobileSwipe = null;
       if (desktopJourney.matches || root2.hidden || tour2.hidden || reduce2.matches || !mascot.ready || event.touches.length !== 1) return;
       if (document.activeElement.matches("input,select,textarea,[contenteditable]") || document.querySelector("dialog[open]")) return;
-      if (event.target.closest?.("input,select,textarea,[contenteditable],#companion-chat,#case-companion,button,a")) return;
+      if (event.target.closest?.("input,select,textarea,[contenteditable],#companion-chat,#case-companion")) return;
+      if (event.target.closest?.("button,a") && !event.target.closest(".journey-card")) return;
       const touch = event.touches[0];
       mobileSwipe = { x: touch.clientX, y: touch.clientY, top: window.scrollY, locked: !!journeyFrame };
     }
@@ -4510,7 +4569,7 @@ var Jangsoni = (() => {
         cancelMobileEntry();
         cardReaction?.cancel();
         const { top, index } = swipe.destination;
-        if (index === null && top > swipe.top) handoff(avatar, boundaryDuration);
+        if (swipe.destination.section === afterJourney && top > swipe.top) handoff(avatar, boundaryDuration);
         moveJourney(top, index, index !== null);
       } else if (mobileEntryPending) {
         clearTimeout(mobileEntryTimer);
@@ -4575,6 +4634,14 @@ var Jangsoni = (() => {
     const requestUpdate = () => {
       if (!updateFrame) updateFrame = requestAnimationFrame(update);
     };
+    steps.forEach((step, index) => step.querySelector(".step-toggle").addEventListener("click", () => {
+      if (desktopJourney.matches || journeyFrame || index === active) return;
+      cancelMobileEntry();
+      if (reduce2.matches) {
+        window.scrollTo({ top: mobileCardTops()[index], behavior: "instant" });
+        setActive(index);
+      } else moveJourney(mobileCardTops()[index], index, true);
+    }));
     window.addEventListener("wheel", onJourneyWheel, { passive: false });
     window.addEventListener("wheel", (event) => {
       if (!desktopJourney.matches && event.deltaY < 0) cancelMobileEntry();
@@ -4599,6 +4666,7 @@ var Jangsoni = (() => {
       cardReaction?.cancel();
       if (journeyFrame || mobileWalkFrame) stopJourneyTransition();
       requestUpdate();
+      syncDetails();
       positionSpeech();
     });
     reduce2.addEventListener("change", () => {

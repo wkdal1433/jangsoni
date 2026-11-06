@@ -5,6 +5,13 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  const counter=root.querySelector('#journey-counter');
  const bar=root.querySelector('#journey-progress-bar');
  const stage=root.querySelector('.journey-sticky');
+ const scrollTrack=root.querySelector('.journey-scroll-track');
+ const snapPoints=steps.map(()=>{
+   const point=document.createElement('div');
+   point.className='journey-snap-point';
+   scrollTrack.append(point);
+   return point;
+ });
  const phrases=['여기부터 살펴볼게요.','약관도 확인해 봐요.','코드도 찾아볼까요?','판례는 이쪽이에요.','논문도 같이 봐요.','음… 이것도 중요해요.','이제 정리해 볼까요?'];
  const {avatar, frameCount, showJourneyPose}=mascot;
  const desktopJourney=window.matchMedia('(min-width: 721px)');
@@ -21,6 +28,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  let lastMobileScroll=window.scrollY;
  let mobileEntryTimer=0, mobileEntryPending=false, mobileTouching=false;
  let mobileSwipe=null;
+ let revealTimer=0;
  let cardReaction;
 
  function cancelMobileEntry(){
@@ -41,11 +49,21 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    stage.style.setProperty('--speech-left',(avatar.offsetLeft+avatar.offsetWidth/2)+'px');
    stage.style.setProperty('--speech-top',(avatar.offsetTop-12)+'px');
  }
+ function syncDetails(){
+   steps.forEach((step,index)=>{
+     const expanded=desktopJourney.matches||index===Math.max(active,0);
+     const toggle=step.querySelector('.step-toggle');
+     toggle.disabled=desktopJourney.matches;
+     toggle.setAttribute('aria-expanded',String(expanded));
+     step.querySelector('.step-detail').inert=!expanded;
+   });
+ }
  if('ResizeObserver' in window){
    const observer=new ResizeObserver(positionSpeech);
    observer.observe(avatar);
    observer.observe(stage);
  }
+ syncDetails();
 
  function setActive(index){
    if(index===active) return;
@@ -56,9 +74,20 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
      if(on) step.setAttribute('aria-current','step');
      else step.removeAttribute('aria-current');
    });
+   syncDetails();
+   clearTimeout(revealTimer);
+   if(!desktopJourney.matches) revealTimer=setTimeout(()=>revealCard(index),reduce.matches?0:360);
    if(sentence) sentence.textContent=phrases[index];
    if(counter) counter.textContent=String(index+1).padStart(2,'0')+' / 07';
    if(bar) bar.style.width=((index+1)/steps.length*100)+'%';
+ }
+ function revealCard(index){
+   if(root.hidden||tour.hidden||desktopJourney.matches) return;
+   const list=steps[index].parentElement;
+   const card=steps[index].getBoundingClientRect();
+   const viewport=list.getBoundingClientRect();
+   const offset=card.top<viewport.top?card.top-viewport.top:Math.max(0,card.bottom-viewport.bottom);
+   if(offset) list.scrollBy({top:offset,behavior:reduce.matches?'instant':'smooth'});
  }
 
  function cardCenters(){
@@ -66,6 +95,9 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
      const rect=step.getBoundingClientRect();
      return window.scrollY+(rect.top+rect.bottom)/2;
    });
+ }
+ function mobileCardTops(){
+   return snapPoints.map(point=>window.scrollY+point.getBoundingClientRect().top);
  }
 
  function nearestCard(centers, viewportCenter){
@@ -87,8 +119,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
      if(mobileDelta>1&&rect.top>2&&rect.top<viewport-24) mobileEntryPending=true;
      if(mobileEntryPending){clearTimeout(mobileEntryTimer);mobileEntryTimer=setTimeout(finishMobileEntry,120);}
    }
-   const focusLine=desktopJourney.matches?viewport/2:(viewport+stage.getBoundingClientRect().height)/2;
-   setActive(nearestCard(cardCenters(),window.scrollY+focusLine));
+   setActive(desktopJourney.matches?nearestCard(cardCenters(),window.scrollY+viewport/2):nearestCard(mobileCardTops(),window.scrollY));
    positionSpeech();
    if(!desktopJourney.matches&&mobileMoved&&Math.abs(stage.getBoundingClientRect().top)<2) playMobileWalk();
  }
@@ -97,7 +128,8 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    const gait=Math.floor(progress*1.5*frameCount)%frameCount;
    showJourneyPose(gait);
    const lift=Math.sin(progress*3*Math.PI);
-   avatar.style.transform='translateY('+(-5*lift*lift)+'px)';
+   const amplitude=desktopJourney.matches?5:1.2*Math.sin(progress*Math.PI);
+   avatar.style.transform='translateY('+(-amplitude*lift*lift)+'px)';
  }
 
  function playMobileWalk(){
@@ -128,9 +160,11 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    journeyFrame=0;
    showJourneyPose(-1);
    avatar.style.transform='';
+   lastMobileScroll=window.scrollY;
  }
 
  function reactToCard(index){
+   if(!desktopJourney.matches) return;
    const card=steps[index].querySelector('.journey-card').getBoundingClientRect();
    const actor=avatar.getBoundingClientRect();
    const towardCard=Math.sign(card.left+card.width/2-actor.left-actor.width/2);
@@ -176,20 +210,17 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  function mobileDestination(direction,scrollTop){
    const topOf=element=>window.scrollY+element.getBoundingClientRect().top;
    const start=topOf(journey),end=topOf(afterJourney);
-   if(scrollTop<start-2||scrollTop>end+2) return;
-   const header=stage.getBoundingClientRect().height;
+   if(scrollTop>end+2) return;
+   if(scrollTop<start-2){
+     if(journey.getBoundingClientRect().top>=innerHeight) return;
+     return {top:direction>0?start:topOf(beforeJourney)+Math.max(0,beforeJourney.offsetHeight-innerHeight),index:null};
+   }
    const targets=[
      {top:topOf(beforeJourney)+Math.max(0,beforeJourney.offsetHeight-innerHeight),index:null},
      {top:start,index:null},
-     ...steps.map((step,index)=>({top:topOf(step)-header,index,section:step})),
-     {top:end,index:null},
+     ...mobileCardTops().map((top,index)=>({top,index})),
+     {top:end,index:null,section:afterJourney},
    ];
-   const current=targets.findLast(target=>target.top<=scrollTop+2);
-   if(current?.section){
-     const lastReadableTop=topOf(current.section)+current.section.offsetHeight-innerHeight;
-     if(direction>0&&scrollTop<lastReadableTop-2) return;
-     if(direction<0&&scrollTop>current.top+2) return;
-   }
    return direction>0?targets.find(target=>target.top>scrollTop+2):targets.findLast(target=>target.top<scrollTop-2);
  }
 
@@ -199,7 +230,8 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    mobileSwipe=null;
    if(desktopJourney.matches||root.hidden||tour.hidden||reduce.matches||!mascot.ready||event.touches.length!==1) return;
    if(document.activeElement.matches('input,select,textarea,[contenteditable]')||document.querySelector('dialog[open]')) return;
-   if(event.target.closest?.('input,select,textarea,[contenteditable],#companion-chat,#case-companion,button,a')) return;
+   if(event.target.closest?.('input,select,textarea,[contenteditable],#companion-chat,#case-companion')) return;
+   if(event.target.closest?.('button,a')&&!event.target.closest('.journey-card')) return;
    const touch=event.touches[0];
    mobileSwipe={x:touch.clientX,y:touch.clientY,top:window.scrollY,locked:!!journeyFrame};
  }
@@ -222,7 +254,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
      cancelMobileEntry();
      cardReaction?.cancel();
      const {top,index}=swipe.destination;
-     if(index===null&&top>swipe.top) handoff(avatar,boundaryDuration);
+     if(swipe.destination.section===afterJourney&&top>swipe.top) handoff(avatar,boundaryDuration);
      moveJourney(top,index,index!==null);
    }else if(mobileEntryPending){
      clearTimeout(mobileEntryTimer);
@@ -290,6 +322,14 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  }
 
  const requestUpdate=()=>{if(!updateFrame) updateFrame=requestAnimationFrame(update);};
+ steps.forEach((step,index)=>step.querySelector('.step-toggle').addEventListener('click',()=>{
+   if(desktopJourney.matches||journeyFrame||index===active) return;
+   cancelMobileEntry();
+   if(reduce.matches){
+     window.scrollTo({top:mobileCardTops()[index],behavior:'instant'});
+     setActive(index);
+   }else moveJourney(mobileCardTops()[index],index,true);
+ }));
  window.addEventListener('wheel',onJourneyWheel,{passive:false});
  window.addEventListener('wheel',event=>{if(!desktopJourney.matches&&event.deltaY<0) cancelMobileEntry();},{passive:true});
  window.addEventListener('touchstart',onMobileTouchStart,{passive:true});
@@ -308,6 +348,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    cardReaction?.cancel();
    if(journeyFrame||mobileWalkFrame) stopJourneyTransition();
    requestUpdate();
+   syncDetails();
    positionSpeech();
  });
  reduce.addEventListener('change',()=>{if(reduce.matches){cardReaction?.cancel();stopJourneyTransition();}});
