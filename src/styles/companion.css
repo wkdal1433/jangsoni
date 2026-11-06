@@ -15,7 +15,11 @@
   background: transparent;
   cursor: grab;
   touch-action: none;
+}
+#case-companion, #case-companion *, .companion-dock, .companion-dock * {
+  -webkit-user-select: none;
   user-select: none;
+  -webkit-touch-callout: none;
 }
 #case-companion[data-dragging] { cursor: grabbing; }
 #case-companion[data-arriving] { visibility: hidden; }
@@ -25,7 +29,6 @@
 #case-companion[data-grabbing] .companion-sprite { visibility:hidden; }
 #case-companion[data-grabbing] .companion-grab-sprite { display:block; }
 #case-companion[data-grabbing] .companion-art { transform-origin:50% 14%; }
-#case-companion { -webkit-touch-callout:none; }
 .companion-flight { position: fixed; z-index: 16; pointer-events: none; transform-origin: top left; }
 .companion-flight svg, .companion-flight img { display: block; width: 100%; height: auto; }
 .companion-source-in-flight { visibility: hidden; }
@@ -38,9 +41,11 @@
   transform: translateY(6px) scale(.88);
   transition: opacity 180ms ease, transform 260ms ease;
 }
-.companion-hint { position: absolute; width: 42px; height: 42px; }
+.companion-hint { position: absolute; width: 42px; height: 42px; display:grid; place-items:center; border:1.7px solid #f0be92; border-radius:14px; background:#fff8ee; color:#555; }
+.companion-hint::after { content:""; position:absolute; bottom:-5px; left:18px; width:8px; height:8px; background:inherit; border-right:inherit; border-bottom:inherit; transform:rotate(45deg); }
+.companion-hint > [data-icon] { width:24px; height:24px; }
 .companion-hint-help { right: 0; top: -28px; transform: rotate(-10deg); }
-.companion-hint-search { right: 70px; top: -5px; transform: rotate(9deg); --hint-delay: -.9s; }
+.companion-hint-search { right: 70px; top: -5px; transform: rotate(9deg); --hint-delay: -.9s; border-color:#b5d1e5; background:#eff7fc; }
 .companion-hint svg { display: block; width: 100%; height: 100%; filter: drop-shadow(0 3px 4px #2a567616); }
 @media (hover: hover) and (pointer: fine) {
   #case-companion:hover[aria-expanded="false"]:not([data-dragging]):is([data-pose="idle"], [data-pose="notice"]) .companion-hints { opacity: 1; transform: none; }

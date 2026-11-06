@@ -223,6 +223,7 @@ export function setupCompanion(root, tour, reduce) {
   });
   button.addEventListener('pointerdown', event => {
     if (event.button !== 0 || drag || returnAnimation) return;
+    window.getSelection()?.removeAllRanges();
     clearTimeout(restTimer);
     restTimer = 0;
     drag = { pointer: event.pointerId, type: event.pointerType, originX: event.clientX, originY: event.clientY, rawX: 0, rawY: 0, x: 0, y: 0, grabbed: false, cancelled: false, home: button.getBoundingClientRect() };
@@ -252,6 +253,9 @@ export function setupCompanion(root, tour, reduce) {
     if (event.detail === 0 && !drag && !returnAnimation) chat.toggle();
   });
   button.addEventListener('contextmenu', event => event.preventDefault());
+  button.addEventListener('touchstart', event => {
+    if (event.cancelable) event.preventDefault();
+  }, { passive: false });
 
   window.addEventListener('scroll', requestUpdate, { passive: true });
   window.addEventListener('resize', () => {

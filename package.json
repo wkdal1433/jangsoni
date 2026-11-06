@@ -10,11 +10,13 @@
     "test:companion": "node scripts/verify-companion-regression.mjs",
     "test:mobile-mascot": "node scripts/verify-mobile-mascot.mjs",
     "test:mobile-pointer": "node scripts/verify-mobile-pointer.mjs",
-    "test:mobile-devtools": "node scripts/verify-mobile-devtools.mjs"
+    "test:mobile-devtools": "node scripts/verify-mobile-devtools.mjs",
+    "test:mobile-polish": "node scripts/verify-mobile-polish.mjs"
   },
   "devDependencies": {
     "esbuild": "0.28.2",
     "html2canvas": "1.4.1",
+    "lucide": "1.70.0",
     "playwright-core": "1.64.1"
   }
 }

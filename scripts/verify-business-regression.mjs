@@ -33,7 +33,15 @@ const renderer = await readFile(require.resolve('html2canvas/dist/html2canvas.mi
 const browser = await chromium.launch({ channel: 'chrome' });
 const screens = ['timeline', 'yakgwan', 'koicd', 'law', 'pubmed', 'fss', 'cardnews'];
 const clean = value => value.replace(/\s+/g, ' ').trim();
-const text = async (page, selector) => clean(await page.locator(selector).textContent());
+const text = async (page, selector) => clean(await page.locator(selector).evaluate(element => {
+  const copy = element.cloneNode(true);
+  // Compare card content and link labels independently of the requested icon change.
+  copy.querySelectorAll('.cn-check').forEach(icon => icon.remove());
+  copy.querySelectorAll('.cn-link a').forEach(link => {
+    if (link.firstChild?.nodeType === Node.TEXT_NODE) link.firstChild.textContent = link.firstChild.textContent.replace(/^🔗 /u, '');
+  });
+  return copy.textContent;
+}));
 const schema = (page, selector) => page.locator(selector).evaluate(root => [...root.querySelectorAll('input,select,textarea,[contenteditable="true"]')].map(el => ({
   tag: el.tagName, id: el.id, name: el.getAttribute('name'), type: el.getAttribute('type'), value: el.value ?? el.textContent,
   placeholder: el.getAttribute('placeholder'), min: el.getAttribute('min'), max: el.getAttribute('max'), step: el.getAttribute('step'),
