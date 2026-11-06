@@ -10,6 +10,9 @@ execFileSync(process.execPath, ['scripts/build.mjs', '--check'], { cwd: root, st
 const ref = process.env.JANGSONI_FLOW_REF;
 const smallHeight = Number(process.env.JANGSONI_FLOW_SMALL_HEIGHT || 0);
 const tall = process.argv.includes('--tall');
+const requestedSize = process.argv.find(arg => arg.startsWith('--size='))?.slice(7).split('x').map(Number);
+if (requestedSize) assert.ok(requestedSize.length === 2 && requestedSize.every(value => Number.isFinite(value) && value > 0));
+const flowSizes = requestedSize ? [requestedSize] : tall ? [[430, 739], [430, 932], [440, 956], [430, 1100]] : [[390, 844], [320, 568]];
 const initialSize = tall ? { width: 430, height: 739 } : { width: 390, height: 844 };
 const changedSize = tall ? { width: 430, height: 932 } : { width: 390, height: 780 };
 let modelHtml = ref ? execFileSync('git', ['show', ref + ':index.html'], { cwd: root, maxBuffer: 40e6 }) : null;
@@ -142,14 +145,20 @@ try {
   if (!process.argv.includes('--resize-only')) {
   const browser = await chromium.launch({ channel: 'chrome' });
   try {
-    for (const mode of (process.argv.includes('--touch-only') ? ['touch'] : ['touch', 'devtools', 'wheel'])) for (const [width, height] of (tall ? [[430, 739], [430, 932], [440, 956], [430, 1100]] : [[390, 844], [320, 568]])) {
+    for (const mode of (process.argv.includes('--touch-only') ? ['touch'] : ['touch', 'devtools', 'wheel'])) for (const [width, height] of flowSizes) {
       const { page, errors } = await open(browser, width, height);
       const swipe = await inputFor(page, mode);
       const settle = () => page.waitForTimeout(1100);
-      const reach = async (selector, direction, label) => {
+      const reach = async (selector, direction, label, nativeFormExit = false) => {
         for (let i = 0; i < 20; i++) {
           const target = await top(page, selector), current = await page.evaluate(() => scrollY);
           if (Math.abs(current - target) < 2) return;
+          if (nativeFormExit && current < target - 2) {
+            // The input form deliberately keeps native panning. Its last swipe can cross the boundary.
+            assert.ok(current > await cardTop(page, 6) + 2, label + ' must not skip the last tour card');
+            assert.ok(await page.evaluate(() => !!document.elementFromPoint(innerWidth / 2, Math.round(innerHeight * .65))?.closest('.demo-section')), label + ' must re-enter the controlled result section');
+            return;
+          }
           assert.ok(direction * (target - current) > 0, label + ' must not skip its destination: ' + JSON.stringify({ target, current, viewport: await page.evaluate(() => ({ width: innerWidth, height: innerHeight, focus: document.activeElement.id, moving: document.documentElement.hasAttribute('data-journey-transition') })) }));
           await swipe(direction); await settle();
         }
@@ -168,7 +177,7 @@ try {
       assert.equal(await page.evaluate(() => window.flowHandoffs), 1, 'Hand the mascot to the corner once when leaving the tour');
       await reach('#analysis-workbench', 1, mode + ' results to input');
       assert.equal(await page.evaluate(() => window.flowHandoffs), 1, 'Reading a tall result section must not repeat the mascot handoff');
-      await reach('.demo-section', -1, mode + ' input to results');
+      await reach('.demo-section', -1, mode + ' input to results', true);
       for (let index = 6; index >= 0; index--) {
         await swipe(-1); await arrived(page, await cardTop(page, index), mode + ' reverse card ' + index);
       }
