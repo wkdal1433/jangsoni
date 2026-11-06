@@ -1,5 +1,13 @@
 # 2026-11-06 장손이 잡기 이미지 생성 기록
 
+## 후속 수정: 오리지널 눈 크기
+
+사용자가 오리지널의 감은 눈이 기본 눈보다 너무 커 보인다고 알려, 기존 오리지널 `grab.png`와 기본 `companion.webp`를 참조해 눈꺼풀만 작고 얇게 편집했다. 가이드 이미지는 변경하지 않았다. 최종 파일은 기존과 같은 `assets/mascot/packs/original/grab.png`이다.
+
+```text
+Use case: precise-object-edit. Input 1 is the edit target: the existing two-frame ORIGINAL otter grab sprite sheet. Input 2 is identity/eye-proportion reference: this original otter's normal four-pose sheet. Change ONLY the closed eyelids in BOTH frames of input 1. The present large laughing arcs look too big. Replace each with a SMALL, thin, restrained closed eyelid, centered where the original pupil would be. Eyelid width about 35 percent of its glasses lens diameter, no more than HALF of the existing arc width and HALF its thickness. Very shallow gentle curve or tiny squeezed shut crease, matching the small normal eyes in input 2; not broad smiling crescents, not thick cartoon eyebrows. Keep eyes fully closed, preserve the pleading pout and the cute 'please put me down' expression. Absolutely preserve head/face shape, brows, nose, muzzle, glasses, all other artwork, original proportions, coat and readable AI CLAIM patch, props, kicking legs, tail, poses, registration, two equal cells, image dimensions and transparency. No changes to guide mascot. Transparent PNG, same two-frame sheet.
+```
+
 내장 image_gen 도구로 생성·편집했습니다. 최종 두 이미지 모두 실제 투명 PNG이며, 각 파일은 같은 크기의 2개 프레임을 나란히 담습니다. 사용자가 추가로 요청한 감은 눈·내려달라는 표정을 최종 자산에 반영했습니다.
 
 최종 저장 위치:

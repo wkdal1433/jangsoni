@@ -79,6 +79,25 @@ async function snap(page, from, to, hammer = false) {
 }
 
 try {
+  for (const [width, height] of [[1440, 900], [1024, 768], [1366, 600]]) {
+    const { page, errors } = await open({ viewport: { width, height } });
+    await tour(page);
+    const route = await targets(page);
+    await jump(page, route.find(target => target.name === 'card-0').top);
+    const geometry = await page.evaluate(() => {
+      const actor = document.querySelector('.journey-mascot-wrap').getBoundingClientRect();
+      const bubble = document.querySelector('#journey-speech').getBoundingClientRect();
+      const tail = getComputedStyle(document.querySelector('#journey-speech'), '::after');
+      return { actor: { top: actor.top, center: actor.left + actor.width / 2 }, bubble: { top: bubble.top, bottom: bubble.bottom, left: bubble.left, right: bubble.right, center: bubble.left + bubble.width / 2 }, tailBottom: tail.bottom };
+    });
+    assert.ok(geometry.bubble.top >= 0 && geometry.bubble.left >= 0 && geometry.bubble.right <= width, 'Desktop bubble must stay in viewport');
+    assert.ok(geometry.bubble.bottom <= geometry.actor.top - 5 && geometry.actor.top - geometry.bubble.bottom < 18, 'Bubble must sit above the mascot');
+    assert.ok(Math.abs(geometry.bubble.center - geometry.actor.center) < 2, 'Tail must point at the actual mascot center');
+    assert.equal(geometry.tailBottom, '-7px');
+    assert.deepEqual(errors, []);
+    console.log('Desktop speech', width + '×' + height, 'above the mascot, centered connected tail and no clipping');
+    await page.close();
+  }
   for (const height of [600, 900]) for (const expanded of [false, true]) {
     const { page, errors } = await open({ viewport: { width: 1440, height } });
     if (expanded) await tour(page);
