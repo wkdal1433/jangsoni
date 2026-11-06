@@ -1,5 +1,7 @@
 # 장손이(JANGSONI) 2.0 — 실행 및 후속 제작 안내
 
+이 브랜치는 카드뉴스의 살구색·주황 테두리·노란 클립·짙은 회색 띠를 앱 화면에 적용한 비교안입니다. 테마는 `src/styles/hyundai.css`에서 관리하며, 기본 선택은 가이드 수달 이미지 묶음입니다.
+
 가이드와 오리지널 비교안은 같은 화면·동작 코드를 사용합니다. 수달은 오른쪽 아래에 배치하고, 둘러보기 카드는 캐릭터 왼쪽에 둡니다. 두 이미지 묶음을 모두 포함하므로 설정한 경로를 바꿔 비교할 수 있습니다. 아래 자산 제작 메모는 초기 v2 기준입니다.
 
 기준: 2026-11-04 / 제공 파일: `index.html` / 원본 캐릭터: `assets/mascot/original.png`
@@ -7,6 +9,13 @@
 ## 1. 실행
 
 `index.html`을 Chrome, Edge 등 최신 브라우저에서 열면 됩니다. 외부 UI 라이브러리 없이 HTML, CSS, JavaScript로 동작하며, 기존 파일의 데이터·화면·조회 로직은 그대로 남겨두었습니다. 상품 약관 등 원래부터 인터넷을 필요로 하는 기능은 인터넷 연결과 해당 외부 서비스에 좌우됩니다.
+
+## 웹 미리보기
+
+- [현대해상 스타일 사이트](https://wkdal1433.github.io/jangsoni/)
+- [휴대전화 접속 QR코드](docs/qr/jangsoni-hyundai.png)
+
+`.github/workflows/pages.yml`은 `v2-hyundai-style`의 배포 HTML·QR·워크플로 변경을 GitHub Pages에 반영합니다. 소스를 수정한 뒤에는 `npm run build`와 검증을 완료하고 생성된 `index.html`을 함께 커밋하세요. 배포 파일은 `index.html`과 `qr.png`이며, 기존 main 브랜치를 변경하지 않습니다.
 
 ## 2. 이번 프로토타입에서 완료한 범위
 
@@ -51,6 +60,7 @@ npm run test:mobile-pointer
 npm run test:mobile-devtools
 npm run test:mobile-polish
 npm run test:hero
+npm run test:mobile-flow
 ```
 
 - `test:scroll`: 둘러보기 열림/닫힘, 소개의 모든 섹션과 7개 카드의 정·역방향 전환, 빠른 휠 입력, 낮은 화면에서 긴 내용 읽기, 입력 중 일반 스크롤, 전환 중 화면 이동, 모바일 및 모션 감소 설정을 검사합니다.
@@ -61,6 +71,7 @@ npm run test:hero
 - `test:mobile-devtools`: Chrome의 마우스→터치 변환을 켜고 카드 안을 천천히 끄는 경우를 검사합니다. 취소 불가능한 Touch Events가 들어와도 포인터 경로로 전환을 완료하고, 짧은 탭과 기능 연결을 유지하는지 확인합니다.
 - `test:mobile-polish`: Chrome·WebKit에서 큰 섹션 6개, 데스크톱 소개 → 입력 안내의 한 번 전환, 모바일 소개의 맨 아래 → 다음 섹션 두 단계 이동, 도움말 영역 선택 방지와 일반 본문 선택, 장손이 터치·Lucide 아이콘·편집 문구 보존을 검사합니다. 처음 실행할 때 `npx playwright-core install webkit`으로 검사 브라우저를 준비하세요.
 - `test:hero`: 1366×744를 포함한 첫 화면의 정·역방향 스냅, 원본 이미지·감은 눈의 표시 비율, 첫 깜빡임과 반복 간격을 확인합니다. 현대해상 브랜치에서는 승인된 `9fad8a0` 화면의 요소 위치·크기도 5개 화면 크기에서 대조합니다.
+- `test:mobile-flow`: 전환 중 화면 높이가 바뀌는 경우를 Chrome·WebKit에서 검사합니다. Chrome에서는 실제 터치 이벤트·DevTools 마우스→터치 변환·휠의 세 입력으로 소개부터 입력 화면까지, 7개 카드와 역방향 경로를 위치 점프 없이 통과하는지 검사합니다. 실제 아이폰 실기기 검사를 대신하지는 않습니다.
 
 자동검사는 프로젝트 HTML만 제공하는 임시 로컬 HTTP 서버에서 실행하고 종료 시 서버를 닫습니다. 모바일 미리보기 입력 문제의 재현·수정 범위는 [DevTools 입력 기록](docs/2026-11-06-devtools-input.md)을 참고하세요. 실제 휴대전화 실기기 검사는 별도입니다.
 

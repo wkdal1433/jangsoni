@@ -25,12 +25,15 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  const beforeJourney=root.querySelector('#landing-guide');
  const afterJourney=root.querySelector(".demo-section");
  const workbench=root.querySelector('#analysis-workbench');
+ const swipeSurfaces=[welcome,about,beforeJourney,journey,afterJourney,board];
+ const swipeSelector='#landing-welcome,#landing-about,#landing-guide,#landing-journey,.demo-section,.journey-board';
  const wheelQuietTime=120;
  let active=-1, updateFrame=0, journeyFrame=0, lastWheel=-Infinity;
  let mobileWalkFrame=0;
  let lastMobileScroll=window.scrollY;
  let mobileEntryTimer=0, mobileEntryPending=false, mobileTouching=false;
  let mobileSwipe=null;
+ let viewportWidth=window.innerWidth;
  let ignoreMobileClick=false;
  let revealTimer=0;
  let cardReaction;
@@ -45,7 +48,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    cancelMobileEntry();
    if(!pending||desktopJourney.matches||root.hidden||tour.hidden||reduce.matches) return;
    if(document.activeElement.matches('input,select,textarea,[contenteditable]')||document.querySelector('dialog[open]')) return;
-   if(journey.getBoundingClientRect().top>2) moveJourney(window.scrollY+journey.getBoundingClientRect().top,null);
+   if(journey.getBoundingClientRect().top>2) moveJourney(window.scrollY+journey.getBoundingClientRect().top,null,false,{section:journey});
  }
 
  function positionSpeech(){
@@ -180,12 +183,17 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    ],{delay:120,duration:460,easing:'ease-in-out'});
  }
 
- function moveJourney(destination,index,walking=false){
+ function moveJourney(destination,index,walking=false,{section,atEnd=false}={}){
    const duration=walking?walkDuration:boundaryDuration;
    const origin=window.scrollY;
    const start=performance.now();
    const tourOpen=!tour.hidden;
    const desktopAtStart=desktopJourney.matches;
+   const targetTop=()=>{
+     if(section) return window.scrollY+section.getBoundingClientRect().top+(atEnd?Math.max(0,section.offsetHeight-innerHeight):0);
+     if(!desktopAtStart&&index!==null) return mobileCardTops()[index];
+     return destination;
+   };
    if(!desktopAtStart) document.documentElement.dataset.journeyTransition='';
    const tick=now=>{
      if(root.hidden||tourOpen!==!tour.hidden||reduce.matches||desktopJourney.matches!==desktopAtStart){
@@ -194,14 +202,14 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
      }
      const progress=Math.max(0,Math.min(1,(now-start)/duration));
      if(progress===1){
-       window.scrollTo({top:destination,behavior:'instant'});
+       window.scrollTo({top:targetTop(),behavior:'instant'});
        if(index!==null) setActive(index);
        stopJourneyTransition();
        if(index!==null) reactToCard(index);
        return;
      }
      const travel=progress*progress*(3-2*progress);
-     window.scrollTo({top:origin+(destination-origin)*travel,behavior:'instant'});
+     window.scrollTo({top:origin+(targetTop()-origin)*travel,behavior:'instant'});
      if(index!==null&&progress>=.5) setActive(index);
      if(walking){
        // A full gait cycle alternates two feet. Three steps take one and a half cycles.
@@ -213,24 +221,15 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  }
 
  function mobileDestination(direction,scrollTop){
-   const topOf=element=>window.scrollY+element.getBoundingClientRect().top;
-   const start=topOf(journey),end=topOf(afterJourney);
-   const aboutTop=topOf(about),guideTop=topOf(beforeJourney);
-   if(scrollTop>=aboutTop-2&&scrollTop<=guideTop+2){
-     const stops=[topOf(welcome)+Math.max(0,welcome.offsetHeight-innerHeight),aboutTop,aboutTop+Math.max(0,about.offsetHeight-innerHeight),guideTop];
-     const top=direction>0?stops.find(top=>top>scrollTop+2):stops.findLast(top=>top<scrollTop-2);
-     if(top!==undefined) return {top,index:null};
-   }
-   if(scrollTop>end+2) return;
-   if(scrollTop<start-2){
-     if(journey.getBoundingClientRect().top>=innerHeight) return;
-     return {top:direction>0?start:topOf(beforeJourney)+Math.max(0,beforeJourney.offsetHeight-innerHeight),index:null};
-   }
+   const sectionStop=(section,atEnd=false)=>({section,atEnd,index:null,top:window.scrollY+section.getBoundingClientRect().top+(atEnd?Math.max(0,section.offsetHeight-innerHeight):0)});
    const targets=[
-     {top:topOf(beforeJourney)+Math.max(0,beforeJourney.offsetHeight-innerHeight),index:null},
-     {top:start,index:null},
+     sectionStop(welcome),sectionStop(welcome,true),
+     sectionStop(about),sectionStop(about,true),
+     sectionStop(beforeJourney),sectionStop(beforeJourney,true),
+     sectionStop(journey),
      ...mobileCardTops().map((top,index)=>({top,index})),
-     {top:end,index:null,section:afterJourney},
+     sectionStop(afterJourney),sectionStop(afterJourney,true),
+     sectionStop(workbench),
    ];
    return direction>0?targets.find(target=>target.top>scrollTop+2):targets.findLast(target=>target.top<scrollTop-2);
  }
@@ -250,8 +249,9 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    if(reduce.matches&&pointer===null) return;
    if(document.activeElement.matches('input,select,textarea,[contenteditable]')||document.querySelector('dialog[open]')) return;
    if(target.closest?.('input,select,textarea,[contenteditable],#companion-chat,#case-companion')) return;
-   if(target.closest?.('button,a')&&!target.closest('.journey-card')) return;
-   mobileSwipe={pointer,x,y,top:window.scrollY,locked:!!journeyFrame,captured:false,surface:target.closest?.('.journey-board,#landing-about')||board};
+   const surface=target.closest?.(swipeSelector);
+   if(!surface) return;
+   mobileSwipe={pointer,x,y,top:window.scrollY,locked:!!journeyFrame,captured:false,surface};
  }
 
  function chooseMobileSwipe(x,y){
@@ -267,10 +267,10 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  function onMobilePointerDown(event){
    ignoreMobileClick=false;
    if(!event.isPrimary){if(event.pointerType==='touch') cancelMobileSwipe();return;}
-   if(event.button!==0||!event.target.closest?.('.journey-board,#landing-about')) return;
+   if(event.button!==0||!event.target.closest?.(swipeSelector)) return;
    if(event.pointerType==='touch'&&reduce.matches) return;
    startMobileSwipe(event.clientX,event.clientY,event.target,event.pointerId);
-   if(mobileSwipe?.surface===about&&event.pointerType==='mouse'){
+   if(mobileSwipe&&mobileSwipe.surface!==board&&event.pointerType==='mouse'){
      window.getSelection()?.removeAllRanges();
      event.preventDefault();
    }
@@ -301,7 +301,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
        if(index!==null) setActive(index);
      }else{
        if(swipe.destination.section===afterJourney&&top>swipe.top) handoff(avatar,boundaryDuration);
-       moveJourney(top,index,index!==null);
+       moveJourney(top,index,index!==null,swipe.destination);
      }
    }
  }
@@ -311,7 +311,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  }
 
  function onJourneyWheel(event){
-   if(root.hidden||!desktopJourney.matches||reduce.matches||!mascot.ready) return;
+   if(root.hidden||reduce.matches||!mascot.ready) return;
    if(document.activeElement.matches('input,select,textarea,[contenteditable]')||document.querySelector('dialog[open]')) return;
    if(event.target.closest?.('input,select,textarea,[contenteditable],#companion-chat')) return;
    if(!event.cancelable||event.defaultPrevented||event.ctrlKey||event.shiftKey||Math.abs(event.deltaY)<=Math.abs(event.deltaX)) return;
@@ -323,16 +323,21 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    }
 
    const direction=Math.sign(event.deltaY);
-   const centers=cardCenters();
-   const halfViewport=window.innerHeight/2;
+   const desktop=desktopJourney.matches;
+   const centers=desktop?cardCenters():mobileCardTops();
+   const halfViewport=desktop?window.innerHeight/2:0;
    const scrollTop=window.scrollY;
    const topOf=element=>scrollTop+element.getBoundingClientRect().top;
    const section=element=>({top:topOf(element),index:null,section:element});
    const targets=[
      section(welcome),
      ...(!tour.hidden?[
-       section(about),section(beforeJourney),
-       {top:topOf(journey),index:null},
+       section(about),
+       ...(!desktop&&about.offsetHeight>innerHeight?[
+         {top:topOf(about)+about.offsetHeight-innerHeight,index:null,section:about,atEnd:true},
+       ]:[]),
+       section(beforeJourney),
+       section(journey),
        ...centers.map((center,index)=>({top:center-halfViewport,index})),
        section(afterJourney),
      ]:[]),
@@ -356,7 +361,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
      :targets.findLast(target=>target.top<scrollTop-2);
    if(!next) return;
    const current=targets.findLast(target=>target.top<=scrollTop+2);
-   if(current?.section&&current.section!==about){
+   if(current?.section&&current.section!==about&&current.section!==journey){
      const lastReadableTop=current.top+current.section.getBoundingClientRect().height-window.innerHeight;
      if(direction>0&&scrollTop<lastReadableTop-2) return;
      if(direction<0&&scrollTop>current.top+2) return;
@@ -366,7 +371,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    cardReaction?.cancel();
    if(direction>0&&next.section===afterJourney) handoff(avatar,boundaryDuration);
    const walking=next.index!==null&&scrollTop>=centers[0]-halfViewport-2&&scrollTop<=centers.at(-1)-halfViewport+2;
-   moveJourney(next.top,next.index,walking);
+   moveJourney(next.top,next.index,walking,next);
  }
 
  const requestUpdate=()=>{if(!updateFrame) updateFrame=requestAnimationFrame(update);};
@@ -384,7 +389,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  window.addEventListener('pointermove',onMobilePointerMove,{passive:false});
  window.addEventListener('pointerup',onMobilePointerUp);
  window.addEventListener('pointercancel',event=>{if(mobileSwipe?.pointer===event.pointerId) cancelMobileSwipe();});
- [board,about].forEach(surface=>surface.addEventListener('lostpointercapture',event=>{if(event.target===surface&&mobileSwipe?.pointer===event.pointerId) cancelMobileSwipe();}));
+ swipeSurfaces.forEach(surface=>surface.addEventListener('lostpointercapture',event=>{if(event.target===surface&&mobileSwipe?.pointer===event.pointerId) cancelMobileSwipe();}));
  window.addEventListener('blur',()=>{cancelMobileSwipe();cancelMobileEntry();mobileTouching=false;});
  window.addEventListener('touchstart',event=>{
    mobileTouching=true;
@@ -414,9 +419,13 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  window.addEventListener('popstate',()=>{cancelMobileSwipe();stopJourneyTransition();});
  window.addEventListener('scroll',requestUpdate,{passive:true});
  window.addEventListener('resize',()=>{
-   cardReaction?.cancel();
-   cancelMobileSwipe();
-   if(journeyFrame||mobileWalkFrame) stopJourneyTransition();
+   // Mobile browser chrome can change height during a swipe without changing the layout width.
+   if(desktopJourney.matches||window.innerWidth!==viewportWidth){
+     cardReaction?.cancel();
+     cancelMobileSwipe();
+     if(journeyFrame||mobileWalkFrame) stopJourneyTransition();
+   }
+   viewportWidth=window.innerWidth;
    requestUpdate();
    syncDetails();
    positionSpeech();
