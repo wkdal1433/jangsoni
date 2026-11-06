@@ -48,6 +48,7 @@ npm run test:regression
 npm run test:companion
 npm run test:mobile-mascot
 npm run test:mobile-pointer
+npm run test:mobile-devtools
 ```
 
 - `test:scroll`: 둘러보기 열림/닫힘, 소개의 모든 섹션과 7개 카드의 정·역방향 전환, 빠른 휠 입력, 낮은 화면에서 긴 내용 읽기, 입력 중 일반 스크롤, 전환 중 화면 이동, 모바일 및 모션 감소 설정을 검사합니다.
@@ -55,6 +56,9 @@ npm run test:mobile-pointer
 - `test:companion`: 7개 메뉴의 첫 방문 안내, 확인·배경 클릭 후 완전 닫힘, 탭별 기록, 채팅·첨부·한글 조합 입력·임시 응답·깜빡임, 짧은/긴 드래그 복귀와 모바일 콘텐츠 여백을 검사합니다.
 - `test:mobile-mascot`: 모바일의 고정 수달 영역·왼쪽 말풍선·7개 카드별 멘트·실제 걷기 프레임과 터치 이벤트로 탭/길게 누르기/손가락 따라가기/버둥거림/놓기/취소를 검사합니다.
 - `test:mobile-pointer`: 실제 터치가 없는 PC 모바일 미리보기에서 마우스로 카드 본문·제목·태그·버튼을 끄는 동작, 취소/복구, 짧은 클릭, 기능 연결, 모션 감소 설정을 검사합니다.
+- `test:mobile-devtools`: Chrome의 마우스→터치 변환을 켜고 카드 안을 천천히 끄는 경우를 검사합니다. 취소 불가능한 Touch Events가 들어와도 포인터 경로로 전환을 완료하고, 짧은 탭과 기능 연결을 유지하는지 확인합니다.
+
+자동검사는 프로젝트 HTML만 제공하는 임시 로컬 HTTP 서버에서 실행하고 종료 시 서버를 닫습니다. 모바일 미리보기 입력 문제의 재현·수정 범위는 [DevTools 입력 기록](docs/2026-11-06-devtools-input.md)을 참고하세요. 실제 휴대전화 실기기 검사는 별도입니다.
 
 모바일 둘러보기와 잡기 동작의 변경은 [2026-11-06 작업 기록](docs/2026-11-06-mobile-mascot.md), 생성 이미지와 프롬프트는 [이미지 생성 기록](docs/2026-11-06-mascot-image-prompts.md)에 정리했습니다.
 

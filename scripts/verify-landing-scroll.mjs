@@ -1,11 +1,12 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
+import { serveTestPreview } from './test-preview.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 execFileSync(process.execPath, ['scripts/build.mjs', '--check'], { cwd: root, stdio: 'inherit' });
+const preview = await serveTestPreview();
 const browser = await chromium.launch({ channel: 'chrome' });
 
 async function open(options = {}) {
@@ -13,8 +14,8 @@ async function open(options = {}) {
   page.setDefaultTimeout(5000);
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
-  await page.route(/^https?:/, route => route.abort());
-  await page.goto(pathToFileURL(join(root, 'index.html')).href);
+  await page.route(/^https?:/, route => preview.matches(route.request().url()) ? route.continue() : route.abort());
+  await page.goto(preview.url);
   await page.locator('.mascot-atlas').waitFor({ state: 'attached' });
   await page.locator('.companion-sprite').waitFor({ state: 'attached' });
   await page.evaluate(() => {
@@ -195,4 +196,5 @@ try {
   }
 } finally {
   await browser.close();
+  await preview.close();
 }

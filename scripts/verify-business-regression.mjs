@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdtemp, readFile, writeFile, unlink, rmdir } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
+import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { transform } from 'esbuild';
 import { chromium } from 'playwright-core';
+import { serveTestPreview } from './test-preview.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const require = createRequire(import.meta.url);
@@ -28,9 +28,7 @@ for (const [index, name] of ['fss', 'koicd'].entries()) {
 }
 console.log('Source parity:', JSON.stringify({ originalFunctions: [...original.matchAll(/function ([a-zA-Z0-9_]+)\(/g)].length, originalEventConnections: [...original.matchAll(/addEventListener\(/g)].length, bothDataPacksMatch: true, navigationAndPreviewChangesAccountedFor: true }));
 
-const scratch = await mkdtemp(join(tmpdir(), 'jangsoni-regression-'));
-const oldFile = join(scratch, 'main.html');
-await writeFile(oldFile, baseline);
+const preview = await serveTestPreview({ '/main.html': baseline });
 const renderer = await readFile(require.resolve('html2canvas/dist/html2canvas.min.js'));
 const browser = await chromium.launch({ channel: 'chrome' });
 const screens = ['timeline', 'yakgwan', 'koicd', 'law', 'pubmed', 'fss', 'cardnews'];
@@ -54,6 +52,7 @@ async function inspect(file, modern) {
   page.on('pageerror', error => errors.push(error.message));
   await page.route(/^https?:/, route => {
     const request = route.request(), url = request.url();
+    if (preview.matches(url)) return route.continue();
     requests.push({ url, body: request.postData() });
     if (url.includes('/html2canvas/1.4.1/')) return route.fulfill({ body: renderer, contentType: 'application/javascript' });
     if (url.includes('eutils.ncbi.nlm.nih.gov')) return route.fulfill({
@@ -65,7 +64,7 @@ async function inspect(file, modern) {
     if (request.isNavigationRequest()) return route.fulfill({ body: '<!doctype html><title>External navigation fixture</title>', contentType: 'text/html' });
     return route.abort();
   });
-  await page.goto(pathToFileURL(file).href);
+  await page.goto(file);
   if (modern) await page.locator('.hero-actions .landing-primary').click();
   const result = { fields: { case: await schema(page, '#case-form') }, outputs: {}, timeline: [], law: [], yak: [], kcd: [], fss: [], templates: [] };
   for (const [id, value] of Object.entries({ 'in-date': '2020-01-02', 'in-job': '사무직', 'in-code': 'I21', 'in-cover': '일반상해사망', 'in-issue': '고지의무' })) await page.locator('#' + id).fill(value);
@@ -206,9 +205,9 @@ async function inspect(file, modern) {
 async function navigation() {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, serviceWorkers: 'block', reducedMotion: 'reduce' });
   const errors = []; page.on('pageerror', error => errors.push(error.message));
-  await page.route(/^https?:/, route => route.request().isNavigationRequest()
+  await page.route(/^https?:/, route => preview.matches(route.request().url()) ? route.continue() : route.request().isNavigationRequest()
     ? route.fulfill({ body: '<!doctype html><title>Navigation fixture</title>', contentType: 'text/html' }) : route.abort());
-  await page.goto(pathToFileURL(join(root, 'index.html')).href);
+  await page.goto(preview.url);
   await page.locator('.hero-actions .landing-primary').click();
   await page.locator('#in-job').fill('검증 직업'); await page.locator('#in-code').fill('I21');
   await page.locator('#start').click();
@@ -241,13 +240,13 @@ async function navigation() {
   const empty = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce', serviceWorkers: 'block', acceptDownloads: true });
   empty.setDefaultTimeout(8000);
   empty.on('pageerror', error => errors.push(error.message));
-  await empty.route(/^https?:/, route => route.request().url().includes('/html2canvas/1.4.1/')
+  await empty.route(/^https?:/, route => preview.matches(route.request().url()) ? route.continue() : route.request().url().includes('/html2canvas/1.4.1/')
     ? route.fulfill({ body: renderer, contentType: 'application/javascript' }) : route.abort());
   const openEmpty = async screen => {
     await empty.locator('.hero-actions .landing-primary').click(); await empty.locator('#start').click();
     await empty.locator('#menu [data-go=' + screen + ']').click(); await acknowledge(empty);
   };
-  await empty.goto(pathToFileURL(join(root, 'index.html')).href); await openEmpty('koicd');
+  await empty.goto(preview.url); await openEmpty('koicd');
   for (const value of await empty.locator('#koicd [data-example-value]').evaluateAll(els => els.map(el => el.dataset.exampleValue))) {
     await empty.locator('#koicd [data-example-value="' + value + '"]').click();
     assert.equal(await empty.locator('#koicd-query').inputValue(), value);
@@ -278,13 +277,12 @@ async function navigation() {
 }
 
 try {
-  const before = await inspect(oldFile, false);
-  const after = await inspect(join(root, 'index.html'), true);
+  const before = await inspect(preview.origin + '/main.html', false);
+  const after = await inspect(preview.url, true);
   assert.deepEqual(after, before, 'An input, template, navigation address or business result differs from main');
   console.log('MATCH:', JSON.stringify({ fields: Object.fromEntries(Object.entries(after.fields).map(([name, fields]) => [name, fields.length])), timelineScenarios: after.timeline.length, lawStates: after.law.length, yakGroups: after.yak.length, kcdQueries: after.kcd.length, fssStates: after.fss.length, cardTemplates: after.templates.length }));
   await navigation();
 } finally {
   await browser.close();
-  await unlink(oldFile);
-  await rmdir(scratch);
+  await preview.close();
 }
