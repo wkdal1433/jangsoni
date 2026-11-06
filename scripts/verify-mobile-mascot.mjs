@@ -1,14 +1,16 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import { readFileSync } from 'node:fs';
 import { chromium } from 'playwright-core';
+import { serveTestPreview } from './test-preview.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const selection = JSON.parse(readFileSync(join(root, 'src/mascot-assets.json'), 'utf8'));
 const profile = JSON.parse(readFileSync(join(root, selection.pack), 'utf8'));
 execFileSync(process.execPath, ['scripts/build.mjs', '--check'], { cwd: root, stdio: 'inherit' });
+const preview = await serveTestPreview();
 const browser = await chromium.launch({ channel: 'chrome' });
 
 try {
@@ -16,8 +18,8 @@ try {
     const page = await browser.newPage({ viewport: { width, height }, isMobile: true, hasTouch: true, reducedMotion: 'no-preference', serviceWorkers: 'block' });
     page.setDefaultTimeout(7000);
     const errors = []; page.on('pageerror', error => { errors.push(error.message); console.error(error.stack); });
-    await page.route(/^https?:/, route => route.abort());
-    await page.goto(pathToFileURL(join(root, 'index.html')).href);
+    await page.route(/^https?:/, route => preview.matches(route.request().url()) ? route.continue() : route.abort());
+    await page.goto(preview.url);
     await page.locator('.companion-grab-sprite').waitFor({ state: 'attached' });
     await page.locator('#show-tour').click();
     await page.waitForFunction(() => Math.abs(document.querySelector('#landing-about').getBoundingClientRect().top) < 2);
@@ -267,4 +269,4 @@ try {
     console.log(width + '×' + height, 'title entry, seven-card accordion swipe/tap, slow swipes on card text/titles/tags/buttons including list overflow, white active card, fixed mascot axis/small lift, standing, inactive focus exclusion, frame registration, tap/hold/flail and seven feature links at 390px');
     await page.close();
   }
-} finally { await browser.close(); }
+} finally { await browser.close(); await preview.close(); }

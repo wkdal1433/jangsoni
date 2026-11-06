@@ -1,11 +1,12 @@
 import assert from 'node:assert/strict';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { chromium } from 'playwright-core';
+import { serveTestPreview } from './test-preview.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 execFileSync(process.execPath, ['scripts/build.mjs', '--check'], { cwd: root, stdio: 'inherit' });
+const preview = await serveTestPreview();
 const browser = await chromium.launch({ channel: 'chrome' });
 const key = 'jangsoni:companion-guides:v1';
 const screens = ['timeline', 'yakgwan', 'koicd', 'law', 'pubmed', 'fss', 'cardnews'];
@@ -18,12 +19,13 @@ try {
     const errors = [], requests = [];
     context.on('page', page => { page.setDefaultTimeout(7000); page.on('pageerror', error => errors.push(error.message)); });
     await context.route(/^https?:/, route => {
+      if (preview.matches(route.request().url())) return route.continue();
       requests.push(route.request().url());
       return route.request().isNavigationRequest()
         ? route.fulfill({ body: '<!doctype html><title>External navigation fixture</title>', contentType: 'text/html' }) : route.abort();
     });
     const page = await context.newPage();
-    const url = pathToFileURL(join(root, 'index.html')).href;
+    const url = preview.url;
     await page.goto(url);
     const dock = page.locator('#case-companion'), panel = page.locator('#companion-chat');
     const enter = async () => { await page.locator('.hero-actions .landing-primary').click(); await page.locator('#start').click(); };
@@ -149,4 +151,4 @@ try {
     console.log(mobile ? 'Mobile' : 'Desktop', 'seven first guides, full dismissal, tab/reload scope, hover hints, soft chat, IME, attachments, draft, local reply, natural blink, motion preference and desktop short/far drag');
     await context.close();
   }
-} finally { await browser.close(); }
+} finally { await browser.close(); await preview.close(); }

@@ -256,7 +256,9 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
 
  function onMobilePointerDown(event){
    ignoreMobileClick=false;
-   if(event.pointerType==='touch'||!event.isPrimary||event.button!==0||!event.target.closest?.('.journey-board')) return;
+   if(!event.isPrimary){if(event.pointerType==='touch') cancelMobileSwipe();return;}
+   if(event.button!==0||!event.target.closest?.('.journey-board')) return;
+   if(event.pointerType==='touch'&&reduce.matches) return;
    startMobileSwipe(event.clientX,event.clientY,event.target,event.pointerId);
  }
 
@@ -373,6 +375,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  window.addEventListener('touchstart',event=>{
    mobileTouching=true;
    if(event.touches.length!==1){cancelMobileSwipe();cancelMobileEntry();return;}
+   if(mobileSwipe?.pointer!=null) return;
    const touch=event.touches[0];
    startMobileSwipe(touch.clientX,touch.clientY,event.target);
  },{passive:true});

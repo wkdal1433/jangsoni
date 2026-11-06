@@ -9,7 +9,8 @@
     "test:regression": "node scripts/verify-business-regression.mjs",
     "test:companion": "node scripts/verify-companion-regression.mjs",
     "test:mobile-mascot": "node scripts/verify-mobile-mascot.mjs",
-    "test:mobile-pointer": "node scripts/verify-mobile-pointer.mjs"
+    "test:mobile-pointer": "node scripts/verify-mobile-pointer.mjs",
+    "test:mobile-devtools": "node scripts/verify-mobile-devtools.mjs"
   },
   "devDependencies": {
     "esbuild": "0.28.2",

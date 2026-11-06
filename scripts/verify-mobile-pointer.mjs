@@ -1,18 +1,19 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
+import { serveTestPreview } from './test-preview.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 execFileSync(process.execPath, ['scripts/build.mjs', '--check'], { cwd: root, stdio: 'inherit' });
+const preview = await serveTestPreview();
 const browser = await chromium.launch({ channel: 'chrome' });
 try {
   for (const [width, height] of [[390, 844], [293, 664]]) {
     const page = await browser.newPage({ viewport: { width, height }, hasTouch: false, isMobile: false, reducedMotion: 'no-preference', serviceWorkers: 'block' });
     const errors = []; page.on('pageerror', error => errors.push(error.message));
-    await page.route(/^https?:/, route => route.abort());
-    await page.goto(pathToFileURL(join(root, 'index.html')).href);
+    await page.route(/^https?:/, route => preview.matches(route.request().url()) ? route.continue() : route.abort());
+    await page.goto(preview.url);
     await page.locator('.mascot-atlas').waitFor({ state: 'attached' });
     await page.locator('#show-tour').click();
     await page.waitForFunction(() => Math.abs(document.querySelector('#landing-about').getBoundingClientRect().top) < 2);
@@ -74,4 +75,4 @@ try {
     assert.equal(await page.evaluate(() => document.documentElement.hasAttribute('data-journey-transition')), false);
     await page.close();
   }
-} finally { await browser.close(); }
+} finally { await browser.close(); await preview.close(); }
