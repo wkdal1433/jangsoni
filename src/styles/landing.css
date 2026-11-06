@@ -183,7 +183,8 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
   html:has(#intro:not([hidden]) #landing-tour:not([hidden])):not(:has(:is(input,select,textarea,[contenteditable]):focus,dialog[open])) #intro:has(.has-mascot-atlas) :is(#landing-welcome,#landing-about,#landing-guide,#landing-journey,.demo-section,.journey-board,.journey-steps) { touch-action:pan-x pinch-zoom; }
   html:has(#intro:not([hidden])):not(:has(:is(input,select,textarea,[contenteditable]):focus)) { scroll-snap-type:y proximity; scroll-padding-block-start:0; }
   #landing-welcome,#landing-about,#landing-guide,#landing-journey,#intro .demo-section,#analysis-workbench { scroll-snap-align:start; scroll-snap-stop:always; }
-  html:has(#intro:not([hidden]) #landing-tour:not([hidden])):not(:has(:is(input,select,textarea,[contenteditable]):focus)) { scroll-snap-type:y mandatory; scroll-behavior:smooth; }
+  /* The mobile controller owns these destinations; native root snapping must not re-snap its result. */
+  html:has(#intro:not([hidden]) .has-mascot-atlas):has(#landing-tour:not([hidden])) { scroll-snap-type:none; scroll-behavior:auto; }
   #intro .landing-footer { scroll-snap-align:end; scroll-snap-stop:always; }
  }
  #intro { font-size:15px; }

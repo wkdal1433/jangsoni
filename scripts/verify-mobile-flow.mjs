@@ -1,18 +1,29 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { readFileSync } from 'node:fs';
 import { chromium, webkit } from 'playwright-core';
 import { serveTestPreview } from './test-preview.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 execFileSync(process.execPath, ['scripts/build.mjs', '--check'], { cwd: root, stdio: 'inherit' });
 const ref = process.env.JANGSONI_FLOW_REF;
-const preview = await serveTestPreview(ref ? { '/previous': execFileSync('git', ['show', ref + ':index.html'], { cwd: root, maxBuffer: 40e6 }) } : {});
+const smallHeight = Number(process.env.JANGSONI_FLOW_SMALL_HEIGHT || 0);
+const tall = process.argv.includes('--tall');
+const initialSize = tall ? { width: 430, height: 739 } : { width: 390, height: 844 };
+const changedSize = tall ? { width: 430, height: 932 } : { width: 390, height: 780 };
+let modelHtml = ref ? execFileSync('git', ['show', ref + ':index.html'], { cwd: root, maxBuffer: 40e6 }) : null;
+if (smallHeight) {
+  assert.ok(Number.isFinite(smallHeight) && smallHeight > 0);
+  modelHtml = (modelHtml || readFileSync(new URL('../index.html', import.meta.url))).toString().replace(/(<style\b[^>]*>)([\s\S]*?)(<\/style>)/gi, (_, start, css, end) => start + css.replace(/\b(\d+(?:\.\d+)?)svh\b/g, (_, value) => String(Number(value) * smallHeight / 100) + 'px') + end);
+}
+const preview = await serveTestPreview(modelHtml ? { '/profile': modelHtml } : {});
 const publicUrl = process.env.JANGSONI_FLOW_URL;
-const url = publicUrl || (ref ? preview.origin + '/previous' : preview.url);
+assert.ok(!(publicUrl && smallHeight), 'The fixed-small-viewport model is a local test, not a change to the public page');
+const url = publicUrl || (modelHtml ? preview.origin + '/profile' : preview.url);
 
 async function open(browser, width = 390, height = 844) {
-  const page = await browser.newPage({ viewport: { width, height }, isMobile: true, hasTouch: true, reducedMotion: 'no-preference', serviceWorkers: 'block' });
+  const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: tall ? 3 : 1, isMobile: true, hasTouch: true, reducedMotion: 'no-preference', serviceWorkers: 'block' });
   page.setDefaultTimeout(5000);
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   await page.route(/^https?:/, route => new URL(route.request().url()).origin === new URL(url).origin ? route.continue() : route.abort());
@@ -22,6 +33,14 @@ async function open(browser, width = 390, height = 844) {
   await page.waitForFunction(() => Math.abs(document.querySelector('#landing-about').getBoundingClientRect().top) < 2);
   await page.evaluate(() => {
     window.flowHandoffs = 0;
+    window.flowTouches = [];
+    let start;
+    addEventListener('touchstart', event => { const touch = event.touches[0]; start = touch && { clientX: touch.clientX, clientY: touch.clientY }; }, { passive: true });
+    addEventListener('touchmove', event => {
+      const touch = event.touches[0];
+      if (!start || !touch || !event.target.closest?.('#landing-welcome,#landing-about,#landing-guide,#landing-journey,.demo-section')) return;
+      window.flowTouches.push({ delta: Math.abs(touch.clientY - start.clientY), vertical: Math.abs(touch.clientY - start.clientY) > Math.abs(touch.clientX - start.clientX), cancelable: event.cancelable, prevented: event.defaultPrevented, snap: getComputedStyle(document.documentElement).scrollSnapType });
+    }, { passive: true });
     new MutationObserver(records => records.forEach(record => record.addedNodes.forEach(node => {
       if (node.nodeType === 1 && node.classList.contains('companion-flight')) window.flowHandoffs++;
     }))).observe(document.body, { childList: true });
@@ -35,6 +54,7 @@ async function arrived(page, expected, label) {
   await page.waitForFunction(y => Math.abs(scrollY - y) < 2 && !document.documentElement.hasAttribute('data-journey-transition'), expected, { timeout: 3500 }).catch(async error => {
     throw new Error(label + ': ' + JSON.stringify({ expected, actual: await page.evaluate(() => ({ y: scrollY, height: innerHeight, moving: document.documentElement.hasAttribute('data-journey-transition') })) }), { cause: error });
   });
+  assert.equal(await page.evaluate(() => getComputedStyle(document.documentElement).scrollSnapType), 'none', label + ': native root snapping must stay off after controller motion');
 }
 
 async function inputFor(page, mode) {
@@ -66,25 +86,39 @@ try {
     const browser = await type.launch(name === 'Chrome' ? { channel: 'chrome' } : {});
     try {
       // A height change during motion used to cancel the animation at its current position.
-      const { page, errors } = await open(browser);
+      const { page, errors } = await open(browser, initialSize.width, initialSize.height);
       const swipe = await inputFor(page, name === 'Chrome' ? 'touch' : 'webkit-mouse');
+      const readingOffset = await top(page, '#landing-about', true) - await top(page, '#landing-about');
       await swipe(1);
       await page.waitForTimeout(90);
       assert.ok(await page.evaluate(() => document.documentElement.hasAttribute('data-journey-transition')));
-      await page.setViewportSize({ width: 390, height: 780 });
-      await arrived(page, await top(page, '#landing-about', true), name + ' changing height must finish at the readable intro end');
+      await page.setViewportSize(changedSize);
+      await arrived(page, await top(page, '#landing-about') + Math.max(readingOffset, await top(page, '#landing-about', true) - await top(page, '#landing-about')), name + ' changing height must not pull the selected reading stop back');
       await swipe(1); await page.waitForTimeout(90);
-      await page.setViewportSize({ width: 390, height: 844 });
+      await page.setViewportSize(initialSize);
       await arrived(page, await top(page, '#landing-guide'), name + ' changing height must not cancel section exit');
+      if (tall) {
+        const guideStart = await top(page, '#landing-guide');
+        const guideOffset = await top(page, '#landing-guide', true) - guideStart;
+        assert.ok(guideOffset > 2);
+        await swipe(1); await page.waitForTimeout(90);
+        await page.setViewportSize(changedSize);
+        assert.ok(await page.locator('#landing-guide').evaluate(el => el.offsetHeight < innerHeight), 'The guide must become shorter than the expanded viewport');
+        await arrived(page, await top(page, '#landing-guide') + guideOffset, name + ' a now-fitting section must not send the swipe back to its top');
+        await swipe(1); await arrived(page, await top(page, '#landing-journey'), name + ' next swipe after height expansion must leave the guide');
+        await swipe(-1); await page.waitForTimeout(90);
+        await page.setViewportSize(initialSize);
+        await arrived(page, await top(page, '#landing-guide'), name + ' shrinking height must not pull a reverse reading stop forward');
+      }
       // Separate card setup: the full forward/reverse walkthrough below never jumps over a section.
       await page.evaluate(y => scrollTo({ top: y, behavior: 'instant' }), await cardTop(page, 2));
       await page.waitForTimeout(1100);
       await swipe(1, '.journey-step.is-active p'); await page.waitForTimeout(90);
-      await page.setViewportSize({ width: 390, height: 780 });
+      await page.setViewportSize(changedSize);
       await arrived(page, await cardTop(page, 3), name + ' card target must follow the new height');
       assert.equal(await page.locator('.journey-step.is-active').getAttribute('aria-current'), 'step');
       await swipe(-1, '.journey-step.is-active p'); await page.waitForTimeout(90);
-      await page.setViewportSize({ width: 390, height: 844 });
+      await page.setViewportSize(initialSize);
       await arrived(page, await cardTop(page, 2), name + ' reverse card transition must survive a height change');
       await page.evaluate(y => scrollTo({ top: y, behavior: 'instant' }), await top(page, '#landing-about'));
       await page.waitForTimeout(500);
@@ -108,7 +142,7 @@ try {
   if (!process.argv.includes('--resize-only')) {
   const browser = await chromium.launch({ channel: 'chrome' });
   try {
-    for (const mode of (process.argv.includes('--touch-only') ? ['touch'] : ['touch', 'devtools', 'wheel'])) for (const [width, height] of [[390, 844], [320, 568]]) {
+    for (const mode of (process.argv.includes('--touch-only') ? ['touch'] : ['touch', 'devtools', 'wheel'])) for (const [width, height] of (tall ? [[430, 739], [430, 932], [440, 956], [430, 1100]] : [[390, 844], [320, 568]])) {
       const { page, errors } = await open(browser, width, height);
       const swipe = await inputFor(page, mode);
       const settle = () => page.waitForTimeout(1100);
@@ -121,7 +155,9 @@ try {
         }
         await arrived(page, await top(page, selector), label);
       };
-      await swipe(1); await arrived(page, await top(page, '#landing-about', true), mode + ' intro bottom');
+      if (await top(page, '#landing-about', true) > await top(page, '#landing-about') + 2) {
+        await swipe(1); await arrived(page, await top(page, '#landing-about', true), mode + ' intro bottom');
+      }
       await swipe(1); await arrived(page, await top(page, '#landing-guide'), mode + ' guide entry');
       await reach('#landing-journey', 1, mode + ' guide to tour title');
       for (let index = 0; index < 7; index++) {
@@ -139,6 +175,13 @@ try {
       await swipe(-1); await arrived(page, await top(page, '#landing-journey'), mode + ' reverse to tour title');
       await reach('#landing-guide', -1, mode + ' reverse to guide');
       await reach('#landing-about', -1, mode + ' reverse to introduction');
+      if (mode !== 'wheel') {
+        const touches = await page.evaluate(() => window.flowTouches);
+        const firstCancelable = touches.find(event => event.vertical && event.cancelable);
+        assert.ok(firstCancelable?.prevented, 'Cancel the first available native vertical touch move: ' + JSON.stringify(touches.slice(0, 5)));
+        assert.ok(touches.filter(event => event.vertical && event.cancelable).every(event => event.prevented), 'Every controlled vertical touch must suppress native pan');
+        assert.ok(touches.every(event => event.snap === 'none'), 'Native root snapping must not take over during touch input');
+      }
       assert.deepEqual(errors, []);
       console.log(mode + ' ' + width + 'x' + height + ': continuous intro → guide → title → seven cards → results → input and reverse, with no programmatic section jumps');
       await page.close();
