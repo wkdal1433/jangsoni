@@ -108,7 +108,7 @@ try {
   if (!process.argv.includes('--resize-only')) {
   const browser = await chromium.launch({ channel: 'chrome' });
   try {
-    for (const mode of ['touch', 'devtools', 'wheel']) for (const [width, height] of [[390, 844], [320, 568]]) {
+    for (const mode of (process.argv.includes('--touch-only') ? ['touch'] : ['touch', 'devtools', 'wheel'])) for (const [width, height] of [[390, 844], [320, 568]]) {
       const { page, errors } = await open(browser, width, height);
       const swipe = await inputFor(page, mode);
       const settle = () => page.waitForTimeout(1100);
