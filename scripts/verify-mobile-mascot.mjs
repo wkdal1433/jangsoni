@@ -18,6 +18,17 @@ try {
     await page.locator('.companion-grab-sprite').waitFor({ state: 'attached' });
     await page.locator('#show-tour').click();
     await page.waitForFunction(() => Math.abs(document.querySelector('#landing-about').getBoundingClientRect().top) < 2);
+    const client = await page.context().newCDPSession(page);
+    const touch = (type, x, y) => client.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' || type === 'touchCancel' ? [] : [{ x, y }] });
+    const swipe = async direction => {
+      const y = direction > 0 ? height * .75 : height * .3;
+      await touch('touchStart', width / 2, y);
+      for (let i = 1; i <= 6; i++) {
+        await touch('touchMove', width / 2, y - direction * 30 * i);
+        await page.waitForTimeout(25);
+      }
+      await touch('touchEnd');
+    };
     const point = index => page.locator('.journey-step').nth(index).evaluate(el => {
       const header = document.querySelector('.journey-sticky').getBoundingClientRect().height;
       return scrollY + el.getBoundingClientRect().top - header;
@@ -59,12 +70,56 @@ try {
     const stand = await page.locator('.mascot-atlas').getAttribute('viewBox');
     await page.waitForTimeout(150);
     assert.equal(await page.locator('.mascot-atlas').getAttribute('viewBox'), stand, 'Walking must stop at a fixed cadence');
+    const entry = await page.evaluate(() => {
+      const el = document.querySelector('#landing-guide').getBoundingClientRect();
+      return { guideEnd: scrollY + el.bottom - innerHeight, title: scrollY + document.querySelector('#landing-journey').getBoundingClientRect().top };
+    });
+    await page.evaluate(y => scrollTo({ top: y, behavior: 'instant' }), entry.guideEnd);
+    await page.waitForTimeout(300);
+    await swipe(1);
+    for (let i = 0; i < 12; i++) {
+      assert.equal(await page.locator('.mascot-atlas').getAttribute('viewBox'), stand, 'Entering the tour must not start walking');
+      await page.waitForTimeout(80);
+    }
+    assert.ok(Math.abs(await page.evaluate(() => scrollY) - entry.title) < 2, 'The first swipe into the tour must align its title to viewport top');
+    const cardSnap = async (index, direction, hammer = false) => {
+      const destination = await point(index), origin = await page.evaluate(() => scrollY);
+      await swipe(direction);
+      const started = performance.now();
+      await page.waitForTimeout(90);
+      const moving = await page.evaluate(() => scrollY);
+      assert.ok(moving > Math.min(origin, destination) + 1 && moving < Math.max(origin, destination) - 1, 'Card transition must animate');
+      const walking = new Set();
+      for (let i = 0; i < 4; i++) {
+        walking.add(await page.locator('.mascot-atlas').getAttribute('viewBox'));
+        await page.waitForTimeout(85);
+      }
+      assert.ok(walking.size >= 3, 'A snapped card transition must play real walking frames');
+      if (hammer) await swipe(-direction);
+      await page.waitForFunction(top => Math.abs(scrollY - top) < 2, destination);
+      assert.ok(performance.now() - started >= 790, 'Card travel must keep its fixed walking duration');
+      await page.waitForTimeout(160);
+      assert.ok(Math.abs(await page.evaluate(() => scrollY) - destination) < 2, 'Extra gestures must not skip or reverse the card');
+      assert.equal(await page.locator('.journey-step').nth(index).getAttribute('aria-current'), 'step');
+      assert.ok(Math.abs((await geometry()).headerTop) < 2);
+    };
+    for (let index = 0; index < 7; index++) await cardSnap(index, 1, index === 2);
+    const demo = await page.locator('.demo-section').evaluate(el => scrollY + el.getBoundingClientRect().top);
+    await swipe(1);
+    await page.waitForFunction(top => Math.abs(scrollY - top) < 2, demo);
+    await page.waitForFunction(() => !('journeyTransition' in document.documentElement.dataset));
+    await swipe(-1);
+    await page.waitForFunction(top => Math.abs(scrollY - top) < 2, await point(6));
+    await page.waitForTimeout(180);
+    for (let index = 5; index >= 0; index--) await cardSnap(index, -1);
+    await swipe(-1);
+    await page.waitForFunction(top => Math.abs(scrollY - top) < 2, entry.title);
+    await page.waitForTimeout(180);
+    assert.equal(await page.locator('.mascot-atlas').getAttribute('viewBox'), stand);
     await page.locator('.demo-section').evaluate(el => el.scrollIntoView({ block: 'start', behavior: 'instant' }));
     await page.locator('#case-companion').waitFor();
     assert.ok(await page.locator('.journey-mascot-wrap').evaluate(el => el.getBoundingClientRect().bottom <= 0));
     const dock = page.locator('#case-companion'), panel = page.locator('#companion-chat');
-    const client = await page.context().newCDPSession(page);
-    const touch = (type, x, y) => client.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' || type === 'touchCancel' ? [] : [{ x, y }] });
     const center = async () => { const r = await dock.boundingBox(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; };
     const tap = await center();
     await touch('touchStart', tap.x, tap.y); await page.waitForTimeout(80); await touch('touchEnd');
@@ -102,7 +157,7 @@ try {
     assert.equal(await dock.getAttribute('data-grabbing'), null);
     assert.equal(await dock.getAttribute('data-dragging'), null);
     assert.deepEqual(errors, []);
-    console.log(width + '×' + height, 'sticky right-hand mascot, left speech, seven-card walk/speech, short tap, long hold, flailing frames, finger anchor, near/far release and cancellation');
+    console.log(width + '×' + height, 'first-swipe title entry without walking, seven-card bidirectional physical swipe snaps, fixed gait and gesture lock, sticky right-hand mascot, left speech, tap/hold/flail, finger anchor, near/far release and cancellation');
     await page.close();
   }
 } finally { await browser.close(); }

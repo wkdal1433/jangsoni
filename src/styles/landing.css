@@ -88,7 +88,8 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
 @media(min-width:721px){
  #intro .journey-sticky { --journey-art-height:min(430px, calc(100svh - 160px)); display:grid; place-items:center; height:var(--journey-art-height); top:calc((100svh - var(--journey-art-height)) / 2); }
  #intro .journey-mascot-wrap,#intro .mascot-atlas { max-height:var(--journey-art-height); }
- #intro .journey-speech { position:absolute; top:calc(50% - 125px); right:calc(50% + 92px); width:max-content; max-width:160px; margin:0; }
+ #intro .journey-speech { position:absolute; top:var(--speech-top,0px); left:var(--speech-left,50%); right:auto; width:max-content; max-width:230px; margin:0; transform:translate(-50%,-100%); }
+ #intro .journey-speech::after { top:auto; bottom:-7px; left:50%; right:auto; transform:translateX(-50%) rotate(45deg); }
  #intro .journey-progress { position:absolute; top:calc(100% + 57px); margin:0; }
  #intro .journey-cards-left .journey-grid { grid-template-columns:63% 37%; grid-template-areas:"cards mascot"; }
  #intro .journey-cards-left .journey-rail { grid-area:mascot; }
@@ -97,8 +98,6 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
 }
 @media(min-width:721px) and (max-width:1040px){
  #intro .journey-cards-left .journey-step { padding-right:22px; }
- #intro .journey-speech { top:0; right:auto; left:0; max-width:170px; }
- #intro .journey-speech::after { top:auto; bottom:-7px; right:20px; transform:rotate(45deg); }
 }
 #intro .step-top { display:flex; justify-content:space-between; align-items:center; gap:20px; border-bottom:1px solid #edf1f4; padding-bottom:22px; }
 #intro .step-id { color:#82a5c4; font-weight:900; font-size:13px; letter-spacing:.14em; }
@@ -172,8 +171,11 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
 }
 @media(max-width:720px){
  @media(prefers-reduced-motion:no-preference){
+  html[data-journey-transition] { scroll-snap-type:none!important; scroll-behavior:auto!important; }
   html:has(#intro:not([hidden])):not(:has(:is(input,select,textarea,[contenteditable]):focus)) { scroll-snap-type:y proximity; scroll-padding-block-start:0; }
   #landing-welcome,#landing-about,#landing-guide,#landing-journey,#intro .demo-section,#analysis-workbench { scroll-snap-align:start; scroll-snap-stop:always; }
+  html:has(#intro:not([hidden]) #landing-tour:not([hidden])):not(:has(:is(input,select,textarea,[contenteditable]):focus)) { scroll-snap-type:y mandatory; scroll-behavior:smooth; }
+  #intro .landing-footer { scroll-snap-align:end; scroll-snap-stop:always; }
  }
  #intro { font-size:15px; }
  #intro .landing-container { width:calc(100% - 38px); }
@@ -206,10 +208,11 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
  #intro .journey-sticky { position:sticky; top:0; height:152px; flex-direction:row; gap:16px; justify-content:center; align-items:center; background:var(--journey-stage-color,#fff); border-radius:0 0 14px 14px; }
  #intro .journey-mascot-wrap { order:1; width:113px; flex:none; }
  #intro .journey-shadow { display:none; }
- #intro .journey-speech { order:0; margin:0; font-size:13px; max-width:180px; }
+ #intro .journey-speech { order:0; position:relative; inset:auto; transform:none; margin:0; font-size:13px; max-width:180px; }
+ #intro .journey-speech::after { left:auto; right:-7px; bottom:auto; top:50%; transform:translateY(-50%) rotate(-45deg); }
  #intro .journey-progress { display:none; }
  #intro .journey-steps { grid-area:cards; margin-top:0; padding-top:152px; }
- #intro .journey-step { min-height:auto; padding:12px 0; scroll-margin-top:164px; }
+ #intro .journey-step { min-height:auto; padding:12px 0; scroll-snap-align:start; scroll-snap-stop:always; scroll-margin-top:152px; }
  #intro .journey-card { border-radius:20px; opacity:1; transform:none; padding:24px 22px; }
  #intro .journey-step.is-active .journey-card { box-shadow:0 10px 32px rgba(47,109,181,.09); transform:none; }
  #intro .journey-card h3 { font-size:27px; margin-top:20px; }
