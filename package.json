@@ -11,7 +11,8 @@
     "test:mobile-mascot": "node scripts/verify-mobile-mascot.mjs",
     "test:mobile-pointer": "node scripts/verify-mobile-pointer.mjs",
     "test:mobile-devtools": "node scripts/verify-mobile-devtools.mjs",
-    "test:mobile-polish": "node scripts/verify-mobile-polish.mjs"
+    "test:mobile-polish": "node scripts/verify-mobile-polish.mjs",
+    "test:hero": "node scripts/verify-hero-continuity.mjs"
   },
   "devDependencies": {
     "esbuild": "0.28.2",
