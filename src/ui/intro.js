@@ -15,7 +15,7 @@ export function setupIntro(root, reduce, navigate) {
  });
  const stage=root.querySelector('.hero-art .mascot-stage');
  const closedFrame=stage.querySelector('.mascot-closed-frame');
- scheduleIdleEffect(stage,reduce,[2700,5000],()=>true,()=>blink(closedFrame));
+ scheduleIdleEffect(stage,reduce,[2600,4200],()=>true,()=>blink(closedFrame),1100);
  if(stage && !reduce.matches){
    let noticeTimer=0;
    stage.addEventListener('pointerenter',(e)=>{

@@ -1,4 +1,4 @@
-export function scheduleIdleEffect(element, reduce, [minimum, maximum], canPlay, play) {
+export function scheduleIdleEffect(element, reduce, [minimum, maximum], canPlay, play, initialDelay) {
   let inView = !('IntersectionObserver' in window);
   let timer = 0;
 
@@ -6,9 +6,12 @@ export function scheduleIdleEffect(element, reduce, [minimum, maximum], canPlay,
     clearTimeout(timer);
     if (!inView || document.hidden || reduce.matches) return;
     timer = setTimeout(() => {
-      if (canPlay()) play();
+      if (canPlay()) {
+        play();
+        initialDelay = undefined;
+      }
       schedule();
-    }, minimum + Math.random() * (maximum - minimum));
+    }, initialDelay ?? minimum + Math.random() * (maximum - minimum));
   }
 
   if ('IntersectionObserver' in window) {

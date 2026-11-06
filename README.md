@@ -50,6 +50,7 @@ npm run test:mobile-mascot
 npm run test:mobile-pointer
 npm run test:mobile-devtools
 npm run test:mobile-polish
+npm run test:hero
 ```
 
 - `test:scroll`: 둘러보기 열림/닫힘, 소개의 모든 섹션과 7개 카드의 정·역방향 전환, 빠른 휠 입력, 낮은 화면에서 긴 내용 읽기, 입력 중 일반 스크롤, 전환 중 화면 이동, 모바일 및 모션 감소 설정을 검사합니다.
@@ -59,6 +60,7 @@ npm run test:mobile-polish
 - `test:mobile-pointer`: 실제 터치가 없는 PC 모바일 미리보기에서 마우스로 카드 본문·제목·태그·버튼을 끄는 동작, 취소/복구, 짧은 클릭, 기능 연결, 모션 감소 설정을 검사합니다.
 - `test:mobile-devtools`: Chrome의 마우스→터치 변환을 켜고 카드 안을 천천히 끄는 경우를 검사합니다. 취소 불가능한 Touch Events가 들어와도 포인터 경로로 전환을 완료하고, 짧은 탭과 기능 연결을 유지하는지 확인합니다.
 - `test:mobile-polish`: Chrome·WebKit에서 큰 섹션 6개, 데스크톱 소개 → 입력 안내의 한 번 전환, 모바일 소개의 맨 아래 → 다음 섹션 두 단계 이동, 도움말 영역 선택 방지와 일반 본문 선택, 장손이 터치·Lucide 아이콘·편집 문구 보존을 검사합니다. 처음 실행할 때 `npx playwright-core install webkit`으로 검사 브라우저를 준비하세요.
+- `test:hero`: 1366×744를 포함한 첫 화면의 정·역방향 스냅, 원본 이미지·감은 눈의 표시 비율, 첫 깜빡임과 반복 간격을 확인합니다. 현대해상 브랜치에서는 승인된 `9fad8a0` 화면의 요소 위치·크기도 5개 화면 크기에서 대조합니다.
 
 자동검사는 프로젝트 HTML만 제공하는 임시 로컬 HTTP 서버에서 실행하고 종료 시 서버를 닫습니다. 모바일 미리보기 입력 문제의 재현·수정 범위는 [DevTools 입력 기록](docs/2026-11-06-devtools-input.md)을 참고하세요. 실제 휴대전화 실기기 검사는 별도입니다.
 
