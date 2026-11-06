@@ -20,6 +20,12 @@ async function open(browser, width = 390, height = 844) {
   await page.locator('.mascot-atlas').waitFor({ state: 'attached' });
   await page.locator('#show-tour').tap();
   await page.waitForFunction(() => Math.abs(document.querySelector('#landing-about').getBoundingClientRect().top) < 2);
+  await page.evaluate(() => {
+    window.flowHandoffs = 0;
+    new MutationObserver(records => records.forEach(record => record.addedNodes.forEach(node => {
+      if (node.nodeType === 1 && node.classList.contains('companion-flight')) window.flowHandoffs++;
+    }))).observe(document.body, { childList: true });
+  });
   return { page, errors };
 }
 
@@ -110,7 +116,7 @@ try {
         for (let i = 0; i < 20; i++) {
           const target = await top(page, selector), current = await page.evaluate(() => scrollY);
           if (Math.abs(current - target) < 2) return;
-          assert.ok(direction * (target - current) > 0, label + ' must not skip its destination');
+          assert.ok(direction * (target - current) > 0, label + ' must not skip its destination: ' + JSON.stringify({ target, current, viewport: await page.evaluate(() => ({ width: innerWidth, height: innerHeight, focus: document.activeElement.id, moving: document.documentElement.hasAttribute('data-journey-transition') })) }));
           await swipe(direction); await settle();
         }
         await arrived(page, await top(page, selector), label);
@@ -123,7 +129,9 @@ try {
         assert.equal(await page.locator('.journey-step').nth(index).getAttribute('aria-current'), 'step');
       }
       await swipe(1); await arrived(page, await top(page, '.demo-section'), mode + ' tour to result section');
+      assert.equal(await page.evaluate(() => window.flowHandoffs), 1, 'Hand the mascot to the corner once when leaving the tour');
       await reach('#analysis-workbench', 1, mode + ' results to input');
+      assert.equal(await page.evaluate(() => window.flowHandoffs), 1, 'Reading a tall result section must not repeat the mascot handoff');
       await reach('.demo-section', -1, mode + ' input to results');
       for (let index = 6; index >= 0; index--) {
         await swipe(-1); await arrived(page, await cardTop(page, index), mode + ' reverse card ' + index);

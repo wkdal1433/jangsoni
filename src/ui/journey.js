@@ -300,7 +300,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
        window.scrollTo({top,behavior:'instant'});
        if(index!==null) setActive(index);
      }else{
-       if(swipe.destination.section===afterJourney&&top>swipe.top) handoff(avatar,boundaryDuration);
+       if(swipe.destination.section===afterJourney&&!swipe.destination.atEnd&&top>swipe.top) handoff(avatar,boundaryDuration);
        moveJourney(top,index,index!==null,swipe.destination);
      }
    }
