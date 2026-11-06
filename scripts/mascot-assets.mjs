@@ -31,12 +31,13 @@ export async function loadMascotAssets(root) {
   const file = join(root, selection.pack);
   const profile = JSON.parse(await readFile(file, 'utf8'));
   const loadImage = image => imageData(join(dirname(file), image));
-  const [hero, heroBlink, walk, companion, companionBlink] = await Promise.all([
+  const [hero, heroBlink, walk, companion, companionBlink, grab] = await Promise.all([
     loadImage(profile.hero.image),
     loadImage(profile.hero.blinkImage),
     loadImage(profile.journey.image),
     loadImage(profile.companion.image),
     loadImage(profile.companion.blinkImage),
+    loadImage(profile.companion.grab.image),
   ]);
 
   return {
@@ -49,6 +50,7 @@ export async function loadMascotAssets(root) {
       atlas: { src: walk, stand: profile.journey.stand, walk: profile.journey.walk, flipX: !!profile.journey.flipX },
       companion,
       companionFlipX: !!profile.companion.flipX,
+      companionGrab: { src: grab, frames: profile.companion.grab.frames },
     },
   };
 }

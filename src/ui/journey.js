@@ -4,6 +4,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  const sentence=root.querySelector('#journey-speech');
  const counter=root.querySelector('#journey-counter');
  const bar=root.querySelector('#journey-progress-bar');
+ const stage=root.querySelector('.journey-sticky');
  const phrases=['여기부터 살펴볼게요.','약관도 확인해 봐요.','코드도 찾아볼까요?','판례는 이쪽이에요.','논문도 같이 봐요.','음… 이것도 중요해요.','이제 정리해 볼까요?'];
  const {avatar, frameCount, showJourneyPose}=mascot;
  const desktopJourney=window.matchMedia('(min-width: 721px)');
@@ -16,6 +17,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  const workbench=root.querySelector('#analysis-workbench');
  const wheelQuietTime=120;
  let active=-1, updateFrame=0, journeyFrame=0, lastWheel=-Infinity;
+ let mobileWalkFrame=0;
  let cardReaction;
 
  function setActive(index){
@@ -51,12 +53,41 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    const viewport=window.innerHeight;
    const rect=journey.getBoundingClientRect();
    if(rect.bottom<0||rect.top>viewport) return;
-   const focusLine=viewport*(desktopJourney.matches?.5:.66);
+   const focusLine=desktopJourney.matches?viewport/2:(viewport+stage.getBoundingClientRect().height)/2;
    setActive(nearestCard(cardCenters(),window.scrollY+focusLine));
+   if(!desktopJourney.matches) playMobileWalk();
+ }
+
+ function showWalkProgress(progress){
+   const gait=Math.floor(progress*1.5*frameCount)%frameCount;
+   showJourneyPose(gait);
+   const lift=Math.sin(progress*3*Math.PI);
+   avatar.style.transform='translateY('+(-5*lift*lift)+'px)';
+ }
+
+ function playMobileWalk(){
+   if(mobileWalkFrame||reduce.matches||!mascot.ready) return;
+   const start=performance.now();
+   const tick=now=>{
+     const rect=journey.getBoundingClientRect();
+     const progress=Math.max(0,Math.min(1,(now-start)/walkDuration));
+     if(progress===1||root.hidden||tour.hidden||reduce.matches||desktopJourney.matches||rect.bottom<=0||rect.top>=innerHeight){
+       cancelAnimationFrame(mobileWalkFrame);
+       mobileWalkFrame=0;
+       showJourneyPose(-1);
+       avatar.style.transform='';
+       return;
+     }
+     showWalkProgress(progress);
+     mobileWalkFrame=requestAnimationFrame(tick);
+   };
+   mobileWalkFrame=requestAnimationFrame(tick);
  }
 
  function stopJourneyTransition(){
    cancelAnimationFrame(journeyFrame);
+   cancelAnimationFrame(mobileWalkFrame);
+   mobileWalkFrame=0;
    journeyFrame=0;
    showJourneyPose(-1);
    avatar.style.transform='';
@@ -78,13 +109,12 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    const origin=window.scrollY;
    const start=performance.now();
    const tourOpen=!tour.hidden;
-   let displayedFrame=-1;
    const tick=now=>{
      if(root.hidden||tourOpen!==!tour.hidden||reduce.matches||!desktopJourney.matches){
        stopJourneyTransition();
        return;
      }
-     const progress=Math.min(1,(now-start)/duration);
+     const progress=Math.max(0,Math.min(1,(now-start)/duration));
      if(progress===1){
        window.scrollTo({top:destination,behavior:'instant'});
        if(index!==null) setActive(index);
@@ -97,13 +127,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
      if(index!==null&&progress>=.5) setActive(index);
      if(walking){
        // A full gait cycle alternates two feet. Three steps take one and a half cycles.
-       const gait=Math.floor(progress*1.5*frameCount)%frameCount;
-       if(gait!==displayedFrame){
-         showJourneyPose(gait);
-         displayedFrame=gait;
-       }
-       const lift=Math.sin(progress*3*Math.PI);
-       avatar.style.transform='translateY('+(-5*lift*lift)+'px)';
+       showWalkProgress(progress);
      }
      journeyFrame=requestAnimationFrame(tick);
    };
@@ -181,9 +205,9 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  window.addEventListener('scroll',requestUpdate,{passive:true});
  window.addEventListener('resize',()=>{
    cardReaction?.cancel();
-   if(journeyFrame) stopJourneyTransition();
+   if(journeyFrame||mobileWalkFrame) stopJourneyTransition();
    requestUpdate();
  });
- reduce.addEventListener('change',()=>{if(reduce.matches) cardReaction?.cancel();});
+ reduce.addEventListener('change',()=>{if(reduce.matches){cardReaction?.cancel();stopJourneyTransition();}});
  requestUpdate();
 }

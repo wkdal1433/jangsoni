@@ -7,7 +7,8 @@
     "build:check": "node scripts/build.mjs --check",
     "test:scroll": "node scripts/verify-landing-scroll.mjs",
     "test:regression": "node scripts/verify-business-regression.mjs",
-    "test:companion": "node scripts/verify-companion-regression.mjs"
+    "test:companion": "node scripts/verify-companion-regression.mjs",
+    "test:mobile-mascot": "node scripts/verify-mobile-mascot.mjs"
   },
   "devDependencies": {
     "esbuild": "0.28.2",

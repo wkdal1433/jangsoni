@@ -66,6 +66,7 @@
   },
   "companion": {
     "image": "companion.webp",
+    "grab": { "image": "grab.png", "frames": [[0, 0, 887, 887], [887, 0, 887, 887]] },
     "flipX": true,
     "size": [
       627,
