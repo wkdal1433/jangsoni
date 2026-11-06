@@ -21,6 +21,14 @@ try {
     await page.locator('.companion-grab-sprite').waitFor({ state: 'attached' });
     await page.locator('#show-tour').click();
     await page.waitForFunction(() => Math.abs(document.querySelector('#landing-about').getBoundingClientRect().top) < 2);
+    await page.evaluate(() => {
+      window.journeyDurations = [];
+      let started;
+      new MutationObserver(() => {
+        if (document.documentElement.hasAttribute('data-journey-transition')) started ??= performance.now();
+        else if (started !== undefined) { window.journeyDurations.push(performance.now() - started); started = undefined; }
+      }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-journey-transition'] });
+    });
     if (selection.pack.includes('/guide/')) {
       const landmarks = await page.evaluate(async crops => {
         const source = new Image(); source.src = document.querySelector('.mascot-atlas image').getAttribute('href'); await source.decode();
@@ -76,6 +84,8 @@ try {
     assert.ok(first.speechRight < first.actorLeft, 'Speech must be left of the left-facing mascot');
     assert.ok(first.speechLeft >= 0 && first.actorRight <= width && first.headerWidth > width - 45);
     assert.ok(first.boardBottom <= height, 'The accordion board must fit in the viewport');
+    const spriteBox = await page.locator('.mascot-atlas').boundingBox();
+    assert.ok(Math.abs(spriteBox.width / spriteBox.height - profile.journey.stand[2] / profile.journey.stand[3]) < .005, 'The sprite viewport must preserve the frame ratio so adjacent atlas cells cannot bleed through');
     const frames = new Set();
     for (let i = 0; i < 5; i++) { frames.add(await page.locator('.mascot-atlas').getAttribute('viewBox')); await page.waitForTimeout(100); }
     assert.ok(frames.size >= 3, 'Mobile scrolling must play real walking frames');
@@ -143,8 +153,8 @@ try {
     assert.ok(Math.abs(await page.evaluate(() => scrollY) - entry.title) < 2, 'The first swipe into the tour must align its title to viewport top');
     const cardSnap = async (index, direction, hammer = false) => {
       const destination = await point(index), origin = await page.evaluate(() => scrollY);
+      await page.evaluate(() => { window.journeyDurations = []; });
       await swipe(direction);
-      const started = performance.now();
       await page.waitForTimeout(90);
       const moving = await page.evaluate(() => scrollY);
       assert.ok(moving > Math.min(origin, destination) + 1 && moving < Math.max(origin, destination) - 1, 'Card transition must animate');
@@ -163,8 +173,8 @@ try {
       assert.ok(Math.max(...walking.positions.map(p => p.x)) - Math.min(...walking.positions.map(p => p.x)) < .5, 'Walking must not sway horizontally');
       assert.ok(Math.max(...walking.positions.map(p => p.y)) - Math.min(...walking.positions.map(p => p.y)) < 1.5, 'Mobile walking must have only a small smooth vertical lift');
       if (hammer) await swipe(-direction);
-      await page.waitForFunction(top => Math.abs(scrollY - top) < 2, destination);
-      assert.ok(performance.now() - started >= 790, 'Card travel must keep its fixed walking duration');
+      await page.waitForFunction(top => Math.abs(scrollY - top) < 2 && !('journeyTransition' in document.documentElement.dataset), destination);
+      assert.ok(await page.evaluate(() => window.journeyDurations.at(-1)) >= 880, 'Card travel must keep its fixed walking duration measured in the browser');
       await page.waitForTimeout(160);
       assert.ok(Math.abs(await page.evaluate(() => scrollY) - destination) < 2, 'Extra gestures must not skip or reverse the card');
       assert.equal(await page.locator('.journey-step').nth(index).getAttribute('aria-current'), 'step');
