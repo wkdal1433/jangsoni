@@ -76,7 +76,8 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
 #intro .journey-mascot-wrap { width:min(310px,90%); position:relative; transform-origin:50% 87%; }
 #intro .journey-mascot-wrap img { display:block; width:100%; height:auto; object-fit:contain; }
 #intro .journey-shadow { height:20px; width:180px; margin-top:-7px; background:radial-gradient(ellipse,rgba(56,92,132,.14),rgba(56,92,132,0) 70%); pointer-events:none; }
-#intro .journey-speech { margin-top:8px; color:#54728e; background:#fff; border:1px solid #e5eef5; border-radius:13px; padding:9px 16px; font-size:13px; font-weight:700; min-height:37px; box-shadow:0 4px 18px rgba(52,80,102,.06); }
+#intro .journey-speech { position:relative; margin-top:8px; color:#54728e; background:#fff; border:1px solid #e5eef5; border-radius:16px; padding:12px 14px; font-size:14px; line-height:1.6; word-break:keep-all; font-weight:700; min-height:37px; box-shadow:0 4px 18px rgba(52,80,102,.06); }
+#intro .journey-speech::after { content:""; position:absolute; right:-7px; top:50%; width:12px; height:12px; background:#fff; border-right:1px solid #e5eef5; border-bottom:1px solid #e5eef5; transform:translateY(-50%) rotate(-45deg); }
 #intro .journey-progress { display:flex; align-items:center; gap:11px; font-size:12px; color:#8496a8; font-weight:700; margin-top:18px; }
 #intro .journey-progress .bar { width:118px; height:4px; background:#e8eef4; border-radius:8px; overflow:hidden; }
 #intro .journey-progress .bar i { display:block; width:14.29%; height:100%; border-radius:8px; background:var(--js-orange); transition:width .25s ease; }
@@ -87,7 +88,7 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
 @media(min-width:721px){
  #intro .journey-sticky { --journey-art-height:min(430px, calc(100svh - 160px)); display:grid; place-items:center; height:var(--journey-art-height); top:calc((100svh - var(--journey-art-height)) / 2); }
  #intro .journey-mascot-wrap,#intro .mascot-atlas { max-height:var(--journey-art-height); }
- #intro .journey-speech { position:absolute; top:100%; margin:8px 0 0; }
+ #intro .journey-speech { position:absolute; top:calc(50% - 125px); right:calc(50% + 92px); width:max-content; max-width:160px; margin:0; }
  #intro .journey-progress { position:absolute; top:calc(100% + 57px); margin:0; }
  #intro .journey-cards-left .journey-grid { grid-template-columns:63% 37%; grid-template-areas:"cards mascot"; }
  #intro .journey-cards-left .journey-rail { grid-area:mascot; }
@@ -96,6 +97,8 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
 }
 @media(min-width:721px) and (max-width:1040px){
  #intro .journey-cards-left .journey-step { padding-right:22px; }
+ #intro .journey-speech { top:0; right:auto; left:0; max-width:170px; }
+ #intro .journey-speech::after { top:auto; bottom:-7px; right:20px; transform:rotate(45deg); }
 }
 #intro .step-top { display:flex; justify-content:space-between; align-items:center; gap:20px; border-bottom:1px solid #edf1f4; padding-bottom:22px; }
 #intro .step-id { color:#82a5c4; font-weight:900; font-size:13px; letter-spacing:.14em; }
@@ -198,15 +201,15 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
  #intro .guide-fields { gap:8px; }
  #intro .guide-field { font-size:13px; min-height:62px; padding:8px 10px; }
  #intro .journey-heading { margin-bottom:35px; }
- #intro .journey-grid { display:block; margin-top:0; }
- #intro .journey-rail { height:auto; position:relative; z-index:3; }
- #intro .journey-sticky { position:sticky; top:0; height:158px; flex-direction:row; justify-content:center; align-items:center; background:linear-gradient(#fff 20%,rgba(255,255,255,.96) 78%,rgba(255,255,255,0)); border-radius:0 0 14px 14px; }
- #intro .journey-mascot-wrap { width:113px; flex:none; }
+ #intro .journey-grid { display:grid; grid-template-columns:minmax(0,1fr); grid-template-areas:"cards"; margin-top:0; }
+ #intro .journey-rail { grid-area:cards; height:auto; position:relative; align-self:stretch; z-index:3; pointer-events:none; }
+ #intro .journey-sticky { position:sticky; top:0; height:152px; flex-direction:row; gap:16px; justify-content:center; align-items:center; background:var(--journey-stage-color,#fff); border-radius:0 0 14px 14px; }
+ #intro .journey-mascot-wrap { order:1; width:113px; flex:none; }
  #intro .journey-shadow { display:none; }
- #intro .journey-speech { margin:0 0 0 12px; font-size:12px; max-width:165px; }
+ #intro .journey-speech { order:0; margin:0; font-size:13px; max-width:180px; }
  #intro .journey-progress { display:none; }
- #intro .journey-steps { margin-top:0; }
- #intro .journey-step { min-height:auto; padding:12px 0; scroll-margin-top:150px; }
+ #intro .journey-steps { grid-area:cards; margin-top:0; padding-top:152px; }
+ #intro .journey-step { min-height:auto; padding:12px 0; scroll-margin-top:164px; }
  #intro .journey-card { border-radius:20px; opacity:1; transform:none; padding:24px 22px; }
  #intro .journey-step.is-active .journey-card { box-shadow:0 10px 32px rgba(47,109,181,.09); transform:none; }
  #intro .journey-card h3 { font-size:27px; margin-top:20px; }
@@ -224,17 +227,4 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
  #intro *,#intro *:before,#intro *:after { animation-duration:.001ms!important; animation-iteration-count:1!important; scroll-behavior:auto!important; transition-duration:.001ms!important; }
  #intro .landing-reveal { opacity:1; transform:none; }
  #intro .journey-card { transform:none; opacity:1; }
-}
-/* Mobile sticky companion must remain within the height of all seven cards. */
-@media(max-width:720px){
- #intro .journey-grid { position:relative; }
- #intro .journey-rail { position:absolute; inset:0; width:100%; height:100%; z-index:3; pointer-events:none; }
- #intro .journey-sticky { pointer-events:none; top:0; justify-content:center; }
- #intro .journey-steps { padding-top:145px; }
-}
-/* On narrow viewports, keep the companion in the introductory flow instead of overlaying readable cards. */
-@media(max-width:720px){
- #intro .journey-rail { position:relative; inset:auto; height:auto; z-index:1; pointer-events:auto; }
- #intro .journey-sticky { position:relative; top:auto; height:152px; background:none; }
- #intro .journey-steps { padding-top:0; }
 }

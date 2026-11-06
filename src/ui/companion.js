@@ -1,4 +1,4 @@
-import { companion as companionSource, companionFlipX } from 'mascot-assets';
+import { companion as companionSource, companionFlipX, companionGrab } from 'mascot-assets';
 import { mountAtlas } from './sprite.js';
 import { blink, scheduleIdleEffect } from './idle-motion.js';
 import { setupCompanionChat } from './companion-chat.js';
@@ -16,7 +16,9 @@ export function setupCompanion(root, tour, reduce) {
   const welcome = root.querySelector('#landing-welcome');
   const journey = root.querySelector('#landing-journey');
   const image = new Image();
+  const grabImage = new Image();
   let sprite, tileWidth, tileHeight;
+  let grabSprite, grabFrame = 0, holdTimer = 0;
   let drag = null;
   let returnAnimation = null;
   let restTimer = 0;
@@ -57,9 +59,53 @@ export function setupCompanion(root, tour, reduce) {
     if (pose !== 'idle') stopIdleMotion();
   }
 
+  function stopGrab() {
+    clearTimeout(holdTimer);
+    holdTimer = 0;
+    cancelAnimationFrame(grabFrame);
+    grabFrame = 0;
+    delete button.dataset.grabbing;
+    stopIdleMotion();
+  }
+
+  function positionGrab() {
+    const home = drag.home;
+    const touch = drag.type === 'touch';
+    const anchorX = touch ? drag.originX - home.x - home.width / 2 : 0;
+    const anchorY = touch ? drag.originY - home.y - home.height * .14 : 0;
+    drag.x = Math.max(-home.x, Math.min(innerWidth - home.x - home.width, drag.rawX + anchorX));
+    drag.y = Math.max(-home.y, Math.min(innerHeight - home.y - home.height, drag.rawY + anchorY));
+    button.style.transform = `translate(${drag.x}px,${drag.y}px)`;
+  }
+
+  function beginGrab() {
+    if (!drag || drag.cancelled || drag.grabbed) return;
+    clearTimeout(holdTimer);
+    holdTimer = 0;
+    drag.grabbed = true;
+    button.dataset.dragging = '';
+    chat.close();
+    stopIdleMotion();
+    button.dataset.pose = 'grabbed';
+    if (grabSprite) button.dataset.grabbing = '';
+    positionGrab();
+    if (reduce.matches) return;
+    art.animate([
+      { transform: 'rotate(-5deg)' }, { transform: 'rotate(6deg)' }, { transform: 'rotate(-5deg)' },
+    ], { duration: 640, iterations: Infinity, easing: 'ease-in-out' });
+    const start = performance.now();
+    const tick = now => {
+      if (!drag?.grabbed) return;
+      if (grabSprite) grabSprite.setAttribute('viewBox', companionGrab.frames[Math.floor(Math.max(0, now - start) / 140) % companionGrab.frames.length].join(' '));
+      grabFrame = requestAnimationFrame(tick);
+    };
+    grabFrame = requestAnimationFrame(tick);
+  }
+
   function resetInteraction() {
     const pointer = drag?.pointer;
     drag = null;
+    stopGrab();
     if (pointer !== undefined && button.hasPointerCapture(pointer)) button.releasePointerCapture(pointer);
     returnAnimation?.cancel();
     returnAnimation = null;
@@ -156,15 +202,16 @@ export function setupCompanion(root, tour, reduce) {
 
   function endDrag(event) {
     if (drag?.pointer !== event.pointerId) return;
-    const { x, y, moved } = drag;
+    const { x, y, grabbed, cancelled } = drag;
     drag = null;
+    stopGrab();
     delete button.dataset.dragging;
-    if (moved && event.type === 'pointerup') {
+    if (grabbed && event.type === 'pointerup') {
       returnToDock(x, y, event.pointerType);
     } else {
       button.style.transform = '';
       setPose(event.pointerType !== 'touch' && button.matches(':hover') ? 'notice' : 'idle');
-      if (event.type === 'pointerup') chat.toggle();
+      if (event.type === 'pointerup' && !cancelled) chat.toggle();
     }
   }
 
@@ -178,27 +225,33 @@ export function setupCompanion(root, tour, reduce) {
     if (event.button !== 0 || drag || returnAnimation) return;
     clearTimeout(restTimer);
     restTimer = 0;
-    drag = { pointer: event.pointerId, originX: event.clientX, originY: event.clientY, x: 0, y: 0, moved: false };
+    drag = { pointer: event.pointerId, type: event.pointerType, originX: event.clientX, originY: event.clientY, rawX: 0, rawY: 0, x: 0, y: 0, grabbed: false, cancelled: false, home: button.getBoundingClientRect() };
     button.setPointerCapture(event.pointerId);
     setPose('notice');
+    holdTimer = setTimeout(beginGrab, event.pointerType === 'touch' ? 420 : 160);
     event.preventDefault();
   });
   button.addEventListener('pointermove', event => {
     if (drag?.pointer !== event.pointerId) return;
-    drag.x = event.clientX - drag.originX;
-    drag.y = event.clientY - drag.originY;
-    if (!drag.moved) {
-      if (Math.hypot(drag.x, drag.y) < dragThreshold) return;
-      drag.moved = true;
-      button.dataset.dragging = '';
-      chat.close();
+    drag.rawX = event.clientX - drag.originX;
+    drag.rawY = event.clientY - drag.originY;
+    if (drag.cancelled) return;
+    if (!drag.grabbed) {
+      if (Math.hypot(drag.rawX, drag.rawY) < dragThreshold) return;
+      if (drag.type === 'touch') {
+        clearTimeout(holdTimer);
+        drag.cancelled = true;
+        return;
+      }
+      beginGrab();
     }
-    button.style.transform = `translate(${drag.x}px,${drag.y}px)`;
+    positionGrab();
   });
   ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(type => button.addEventListener(type, endDrag));
   button.addEventListener('click', event => {
     if (event.detail === 0 && !drag && !returnAnimation) chat.toggle();
   });
+  button.addEventListener('contextmenu', event => event.preventDefault());
 
   window.addEventListener('scroll', requestUpdate, { passive: true });
   window.addEventListener('resize', () => {
@@ -221,6 +274,10 @@ export function setupCompanion(root, tour, reduce) {
     update();
   };
   image.src = companionSource;
+  grabImage.onload = () => {
+    grabSprite = mountAtlas(art, grabImage, companionGrab.frames[0], 'companion-grab-sprite', companionFlipX);
+  };
+  grabImage.src = companionGrab.src;
   scheduleIdleEffect(button, reduce, [2500, 4800], canIdle, () => blink(closedFrame));
   scheduleIdleEffect(button, reduce, [2300, 4300], canIdle, fidget);
 
