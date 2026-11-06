@@ -56,6 +56,7 @@
     <section class="journey-section journey-cards-left" id="landing-journey"><div class="landing-container">
       <div class="journey-heading landing-reveal"><span class="section-eyebrow">EXPLORE WITH JANGSONI</span><h2 class="section-heading">장손이와 함께<br>하나씩 둘러볼까요?</h2><p class="section-desc">사건을 입력하기 전에도 각 기능을 열어볼 수 있어요. 사건 정보를 입력했다면 그 내용으로 자료를 찾아요.</p></div>
       <div class="journey-grid">
+        <div class="journey-board">
         <aside class="journey-rail" aria-label="현재 안내 단계"><div class="journey-sticky">
           <div class="journey-mascot-wrap" aria-hidden="true"><img id="journey-static-frame" data-mascot-clone alt=""><img id="journey-walk-frame" alt="" hidden></div>
           <div class="journey-shadow" aria-hidden="true"></div><div class="journey-speech" id="journey-speech" aria-live="off">여기부터 살펴볼게요.</div>
@@ -63,39 +64,41 @@
         </div></aside>
         <div class="journey-steps"><article class="journey-step is-active" data-step="0" aria-current="step">
   <div class="journey-card"><div class="step-top"><span class="step-id">STEP 01 / 07</span><span class="step-symbol" aria-hidden="true">◷</span></div>
-  <h3>사건 타임라인</h3><p>중요한 날짜와 진료 이력을 따라 사건의 흐름을 정리합니다.</p><div class="step-features"><span>날짜·이력</span><span>규칙 기반 검토</span></div>
-  <button class="step-open" type="button" data-preview-go="timeline">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+  <h3><button class="step-toggle" type="button" aria-expanded="true" aria-controls="journey-detail-0">사건 타임라인</button></h3><div class="step-detail" id="journey-detail-0"><div class="step-detail-inner"><p>중요한 날짜와 진료 이력을 따라 사건의 흐름을 정리합니다.</p><div class="step-features"><span>날짜·이력</span><span>규칙 기반 검토</span></div>
+  <button class="step-open" type="button" data-preview-go="timeline">기능 열어보기 <span aria-hidden="true">↗</span></button></div></div></div>
 </article>
 <article class="journey-step" data-step="1">
   <div class="journey-card"><div class="step-top"><span class="step-id">STEP 02 / 07</span><span class="step-symbol" aria-hidden="true">▤</span></div>
-  <h3>보험 약관</h3><p>가입 당시 상품 약관과 담보별 지급사유·제한사유를 검토합니다.</p><div class="step-features"><span>상품별 약관</span><span>담보 확인</span></div>
-  <button class="step-open" type="button" data-preview-go="yakgwan">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+  <h3><button class="step-toggle" type="button" aria-expanded="false" aria-controls="journey-detail-1">보험 약관</button></h3><div class="step-detail" id="journey-detail-1"><div class="step-detail-inner"><p>가입 당시 상품 약관과 담보별 지급사유·제한사유를 검토합니다.</p><div class="step-features"><span>상품별 약관</span><span>담보 확인</span></div>
+  <button class="step-open" type="button" data-preview-go="yakgwan">기능 열어보기 <span aria-hidden="true">↗</span></button></div></div></div>
 </article>
 <article class="journey-step" data-step="2">
   <div class="journey-card"><div class="step-top"><span class="step-id">STEP 03 / 07</span><span class="step-symbol" aria-hidden="true">＋</span></div>
-  <h3>KCD 진단코드</h3><p>질병분류 코드와 코딩지침, 관련 사례를 한곳에서 살펴봅니다.</p><div class="step-features"><span>KCD 검색</span><span>코딩지침</span></div>
-  <button class="step-open" type="button" data-preview-go="koicd">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+  <h3><button class="step-toggle" type="button" aria-expanded="false" aria-controls="journey-detail-2">KCD 진단코드</button></h3><div class="step-detail" id="journey-detail-2"><div class="step-detail-inner"><p>질병분류 코드와 코딩지침, 관련 사례를 한곳에서 살펴봅니다.</p><div class="step-features"><span>KCD 검색</span><span>코딩지침</span></div>
+  <button class="step-open" type="button" data-preview-go="koicd">기능 열어보기 <span aria-hidden="true">↗</span></button></div></div></div>
 </article>
 <article class="journey-step" data-step="3">
   <div class="journey-card"><div class="step-top"><span class="step-id">STEP 04 / 07</span><span class="step-symbol" aria-hidden="true">⚖</span></div>
-  <h3>판례 검색</h3><p>관련 법률 판례에서 주요 쟁점과 판단 근거를 확인합니다.</p><div class="step-features"><span>쟁점별 판례</span><span>법적 근거</span></div>
-  <button class="step-open" type="button" data-preview-go="law">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+  <h3><button class="step-toggle" type="button" aria-expanded="false" aria-controls="journey-detail-3">판례 검색</button></h3><div class="step-detail" id="journey-detail-3"><div class="step-detail-inner"><p>관련 법률 판례에서 주요 쟁점과 판단 근거를 확인합니다.</p><div class="step-features"><span>쟁점별 판례</span><span>법적 근거</span></div>
+  <button class="step-open" type="button" data-preview-go="law">기능 열어보기 <span aria-hidden="true">↗</span></button></div></div></div>
 </article>
 <article class="journey-step" data-step="4">
   <div class="journey-card"><div class="step-top"><span class="step-id">STEP 05 / 07</span><span class="step-symbol" aria-hidden="true">⌕</span></div>
-  <h3>의학 논문</h3><p>PubMed에서 진단명과 의학적 근거를 연결해 찾아봅니다.</p><div class="step-features"><span>PubMed</span><span>의학 근거</span></div>
-  <button class="step-open" type="button" data-preview-go="pubmed">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+  <h3><button class="step-toggle" type="button" aria-expanded="false" aria-controls="journey-detail-4">의학 논문</button></h3><div class="step-detail" id="journey-detail-4"><div class="step-detail-inner"><p>PubMed에서 진단명과 의학적 근거를 연결해 찾아봅니다.</p><div class="step-features"><span>PubMed</span><span>의학 근거</span></div>
+  <button class="step-open" type="button" data-preview-go="pubmed">기능 열어보기 <span aria-hidden="true">↗</span></button></div></div></div>
 </article>
 <article class="journey-step" data-step="5">
   <div class="journey-card"><div class="step-top"><span class="step-id">STEP 06 / 07</span><span class="step-symbol" aria-hidden="true">≋</span></div>
-  <h3>금감원 분쟁조정</h3><p>분쟁조정 결정례와 사례를 함께 검토합니다.</p><div class="step-features"><span>결정례</span><span>금감원 사례</span></div>
-  <button class="step-open" type="button" data-preview-go="fss">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+  <h3><button class="step-toggle" type="button" aria-expanded="false" aria-controls="journey-detail-5">금감원 분쟁조정</button></h3><div class="step-detail" id="journey-detail-5"><div class="step-detail-inner"><p>분쟁조정 결정례와 사례를 함께 검토합니다.</p><div class="step-features"><span>결정례</span><span>금감원 사례</span></div>
+  <button class="step-open" type="button" data-preview-go="fss">기능 열어보기 <span aria-hidden="true">↗</span></button></div></div></div>
 </article>
 <article class="journey-step" data-step="6">
   <div class="journey-card"><div class="step-top"><span class="step-id">STEP 07 / 07</span><span class="step-symbol" aria-hidden="true">▦</span></div>
-  <h3>카드뉴스 제작</h3><p>검토한 내용을 이해하기 쉬운 카드뉴스 형태로 정리합니다.</p><div class="step-features"><span>자료 작성</span><span>결과물 편집</span></div>
-  <button class="step-open" type="button" data-preview-go="cardnews">기능 열어보기 <span aria-hidden="true">↗</span></button></div>
+  <h3><button class="step-toggle" type="button" aria-expanded="false" aria-controls="journey-detail-6">카드뉴스 제작</button></h3><div class="step-detail" id="journey-detail-6"><div class="step-detail-inner"><p>검토한 내용을 이해하기 쉬운 카드뉴스 형태로 정리합니다.</p><div class="step-features"><span>자료 작성</span><span>결과물 편집</span></div>
+  <button class="step-open" type="button" data-preview-go="cardnews">기능 열어보기 <span aria-hidden="true">↗</span></button></div></div></div>
 </article></div>
+        </div>
+        <div class="journey-scroll-track" aria-hidden="true"></div>
       </div>
     </div></section>
     <section class="demo-section"><div class="landing-container demo-panel">

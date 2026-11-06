@@ -53,14 +53,17 @@ async function snap(page, from, to, hammer = false) {
   await page.mouse.move(10, 10);
   const direction = Math.sign(to.top - from.top);
   const walking = from.name.startsWith('card-') && to.name.startsWith('card-');
+  const wheelClient = hammer ? await page.context().newCDPSession(page) : null;
   const started = performance.now();
   await page.mouse.wheel(0, direction * 90);
   await page.waitForTimeout(90);
   const middle = await page.evaluate(() => scrollY);
   assert.ok(middle > Math.min(from.top, to.top) + 1 && middle < Math.max(from.top, to.top) - 1, from.name + ' → ' + to.name + ' must animate');
-  if (hammer) for (let i = 0; i < 4; i++) {
-    await page.mouse.wheel(0, (i % 2 ? -1 : 1) * 2400);
-    await page.waitForTimeout(45);
+  if (hammer) {
+    await Promise.all([0, 20, 40, 60].map((delay, i) => new Promise(resolve => setTimeout(resolve, delay)).then(() =>
+      wheelClient.send('Input.dispatchMouseEvent', { type: 'mouseWheel', x: 10, y: 10, deltaX: 0, deltaY: (i % 2 ? -1 : 1) * 2400 })
+    )));
+    await wheelClient.detach();
   }
   await page.waitForFunction(top => Math.abs(scrollY - top) < 2, to.top, { timeout: 2500 }).catch(async error => {
     throw new Error(JSON.stringify({ from, to, stoppedAt: await page.evaluate(() => scrollY) }), { cause: error });
