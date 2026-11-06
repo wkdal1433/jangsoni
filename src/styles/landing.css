@@ -180,7 +180,7 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
 @media(max-width:720px){
  @media(prefers-reduced-motion:no-preference){
   html[data-journey-transition] { scroll-snap-type:none!important; scroll-behavior:auto!important; }
-  #landing-about,#intro .journey-board:has(.has-mascot-atlas),#intro .journey-board:has(.has-mascot-atlas) .journey-steps { touch-action:pan-x pinch-zoom; }
+  html:has(#intro:not([hidden]) #landing-tour:not([hidden])):not(:has(:is(input,select,textarea,[contenteditable]):focus,dialog[open])) #intro:has(.has-mascot-atlas) :is(#landing-welcome,#landing-about,#landing-guide,#landing-journey,.demo-section,.journey-board,.journey-steps) { touch-action:pan-x pinch-zoom; }
   html:has(#intro:not([hidden])):not(:has(:is(input,select,textarea,[contenteditable]):focus)) { scroll-snap-type:y proximity; scroll-padding-block-start:0; }
   #landing-welcome,#landing-about,#landing-guide,#landing-journey,#intro .demo-section,#analysis-workbench { scroll-snap-align:start; scroll-snap-stop:always; }
   html:has(#intro:not([hidden]) #landing-tour:not([hidden])):not(:has(:is(input,select,textarea,[contenteditable]):focus)) { scroll-snap-type:y mandatory; scroll-behavior:smooth; }
