@@ -115,7 +115,7 @@ try {
     await jump(page, 0);
     for (let i = 1; i < route.length; i++) {
       let from = route[i - 1];
-      if (['welcome', 'about', 'guide', 'demo'].includes(from.name) && route[i].top - from.top > height + 2) {
+      if (['welcome', 'guide', 'demo'].includes(from.name) && route[i].top - from.top > height + 2) {
         await page.mouse.wheel(0, 90); await page.waitForTimeout(200);
         const reading = await page.evaluate(() => scrollY);
         assert.ok(reading > from.top + 1 && reading < route[i].top - 2, from.name + ' must remain readable before snapping');

@@ -5,6 +5,9 @@ import { mascotAtlas } from './mascot-config.js';
 import { createNavigation } from './navigation.js';
 import { setupCompanion } from './companion.js';
 import { setupSearchExamples } from './search-examples.js';
+import { setupIcons } from './icons.js';
+
+setupIcons();
 
 const root = document.getElementById('intro');
 const tour = document.getElementById('landing-tour');

@@ -38,6 +38,7 @@ const values = Object.fromEntries(await Promise.all([
   ['FSS_DATA', readText('src/data/fss.js')],
   ['KOICD_DATA', readText('src/data/koicd.js')],
   ['ANALYSIS_JS', readText('src/analysis.js')],
+  ['LUCIDE_LICENSE', readText('node_modules/lucide/LICENSE')],
   ...Object.entries(assets.html),
   ['APP_JS', app.outputFiles[0].text.trimEnd().replace(/<\/script/gi, '<\\/script')],
 ].map(async ([name, value]) => [name, await value])));

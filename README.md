@@ -49,6 +49,7 @@ npm run test:companion
 npm run test:mobile-mascot
 npm run test:mobile-pointer
 npm run test:mobile-devtools
+npm run test:mobile-polish
 ```
 
 - `test:scroll`: 둘러보기 열림/닫힘, 소개의 모든 섹션과 7개 카드의 정·역방향 전환, 빠른 휠 입력, 낮은 화면에서 긴 내용 읽기, 입력 중 일반 스크롤, 전환 중 화면 이동, 모바일 및 모션 감소 설정을 검사합니다.
@@ -57,12 +58,17 @@ npm run test:mobile-devtools
 - `test:mobile-mascot`: 모바일의 고정 수달 영역·왼쪽 말풍선·7개 카드별 멘트·실제 걷기 프레임과 터치 이벤트로 탭/길게 누르기/손가락 따라가기/버둥거림/놓기/취소를 검사합니다.
 - `test:mobile-pointer`: 실제 터치가 없는 PC 모바일 미리보기에서 마우스로 카드 본문·제목·태그·버튼을 끄는 동작, 취소/복구, 짧은 클릭, 기능 연결, 모션 감소 설정을 검사합니다.
 - `test:mobile-devtools`: Chrome의 마우스→터치 변환을 켜고 카드 안을 천천히 끄는 경우를 검사합니다. 취소 불가능한 Touch Events가 들어와도 포인터 경로로 전환을 완료하고, 짧은 탭과 기능 연결을 유지하는지 확인합니다.
+- `test:mobile-polish`: Chrome·WebKit에서 큰 섹션 6개, 데스크톱 소개 → 입력 안내의 한 번 전환, 모바일 소개의 맨 아래 → 다음 섹션 두 단계 이동, 도움말 영역 선택 방지와 일반 본문 선택, 장손이 터치·Lucide 아이콘·편집 문구 보존을 검사합니다. 처음 실행할 때 `npx playwright-core install webkit`으로 검사 브라우저를 준비하세요.
 
 자동검사는 프로젝트 HTML만 제공하는 임시 로컬 HTTP 서버에서 실행하고 종료 시 서버를 닫습니다. 모바일 미리보기 입력 문제의 재현·수정 범위는 [DevTools 입력 기록](docs/2026-11-06-devtools-input.md)을 참고하세요. 실제 휴대전화 실기기 검사는 별도입니다.
 
 모바일 둘러보기와 잡기 동작의 변경은 [2026-11-06 작업 기록](docs/2026-11-06-mobile-mascot.md), 생성 이미지와 프롬프트는 [이미지 생성 기록](docs/2026-11-06-mascot-image-prompts.md)에 정리했습니다.
 
 업무 비교 테스트는 외부 응답을 고정한 자료로 대체해 원본과 같은 조건에서 실행합니다. 실제 외부 서비스 연결 결과와는 구분합니다. 원본 비교에는 Git의 `main` 브랜치가 필요하며, 생성한 `index.html`이 소스와 맞지 않으면 검사를 시작하지 않습니다.
+
+## UI 아이콘 규칙
+
+사용자가 선택한 Lucide 1.70.0으로 UI 아이콘을 통일했습니다. `src/ui/icons.js`의 등록 목록에서만 이름을 추가하고 `data-icon`으로 사용합니다. 다른 아이콘 세트나 장식용 이모지를 UI에 섞지 않습니다. 사용자 입력·자료 문구와 회사 H 표시는 이 UI 아이콘 등록 대상에 포함하지 않습니다. 필요한 아이콘만 HTML에 묶으며 별도 아이콘 CDN 요청은 없습니다. Lucide의 배포 라이선스는 생성 HTML의 주석에 포함합니다.
 
 ## 3. 초기 v2의 아트 제작 참고
 
