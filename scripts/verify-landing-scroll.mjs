@@ -17,6 +17,11 @@ async function open(options = {}) {
   await page.goto(pathToFileURL(join(root, 'index.html')).href);
   await page.locator('.mascot-atlas').waitFor({ state: 'attached' });
   await page.locator('.companion-sprite').waitFor({ state: 'attached' });
+  await page.evaluate(() => {
+    window.scrollAudit = [];
+    window.addEventListener('wheel', event => window.scrollAudit.push({ event: 'wheel', time: performance.now(), y: scrollY, delta: event.deltaY, cancelable: event.cancelable, prevented: event.defaultPrevented }), { passive: true });
+    window.addEventListener('resize', () => window.scrollAudit.push({ event: 'resize', time: performance.now(), y: scrollY, height: innerHeight }));
+  });
   await page.mouse.move(10, 10);
   return { page, errors };
 }
@@ -49,6 +54,7 @@ async function jump(page, top) {
 }
 
 async function snap(page, from, to, hammer = false) {
+  await page.evaluate(() => { window.scrollAudit = []; });
   assert.ok(Math.abs(await page.evaluate(() => scrollY) - from.top) < 2, from.name + ' origin');
   await page.mouse.move(10, 10);
   const direction = Math.sign(to.top - from.top);
@@ -66,11 +72,11 @@ async function snap(page, from, to, hammer = false) {
     await wheelClient.detach();
   }
   await page.waitForFunction(top => Math.abs(scrollY - top) < 2, to.top, { timeout: 2500 }).catch(async error => {
-    throw new Error(JSON.stringify({ from, to, stoppedAt: await page.evaluate(() => scrollY) }), { cause: error });
+    throw new Error(JSON.stringify({ from, to, state: await page.evaluate(() => ({ y: scrollY, focus: document.activeElement.outerHTML.slice(0, 160), audit: window.scrollAudit })) }), { cause: error });
   });
   assert.ok(performance.now() - started >= (walking ? 820 : 360), from.name + ' → ' + to.name + ' duration');
   await page.waitForTimeout(160);
-  assert.ok(Math.abs(await page.evaluate(() => scrollY) - to.top) < 2, 'Fast input must not skip the destination');
+  assert.ok(Math.abs(await page.evaluate(() => scrollY) - to.top) < 2, 'Fast input must not skip the destination: ' + JSON.stringify({ from, to, state: await page.evaluate(() => ({ y: scrollY, audit: window.scrollAudit })) }));
   const actors = await page.evaluate(() => {
     const visible = selector => {
       const el = document.querySelector(selector), r = el.getBoundingClientRect();

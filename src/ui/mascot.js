@@ -13,6 +13,7 @@ export function createMascot(root, atlas) {
  let spritesReady=false;
  let journeyAtlas=null;
  if(atlas){
+   avatar.style.setProperty('--journey-aspect',atlas.stand[2]+'/'+atlas.stand[3]);
    const source=new Image();
    source.onload=()=>{
      journeyAtlas=mountAtlas(avatar,source,atlas.stand,'mascot-atlas',atlas.flipX);

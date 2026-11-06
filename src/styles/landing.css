@@ -215,7 +215,7 @@ body { background:#FBFCFE; color:var(--js-ink); font-family:Pretendard, "Apple S
  #intro .journey-snap-point:last-child { height:100svh; }
  #intro .journey-rail { height:auto; flex:none; pointer-events:none; }
  #intro .journey-sticky { position:relative; top:0; height:clamp(88px,15svh,128px); display:grid; grid-template-columns:minmax(0,1fr) clamp(84px,14svh,116px); gap:16px; align-items:center; padding-inline:12px; background:var(--journey-stage-color,#fff); }
- #intro .journey-mascot-wrap { grid-column:2; grid-row:1; width:100%; height:calc(clamp(88px,15svh,128px) - 10px); display:grid; place-items:center; }
+ #intro .journey-mascot-wrap { grid-column:2; grid-row:1; justify-self:center; width:auto; max-width:100%; height:min(calc(clamp(88px,15svh,128px) - 10px),clamp(84px,14svh,116px)); aspect-ratio:var(--journey-aspect,1); display:grid; place-items:center; }
  #intro .journey-mascot-wrap :is(img,.mascot-atlas) { width:100%; height:100%; object-fit:contain; }
  #intro .journey-shadow { display:none; }
  #intro .journey-speech { grid-column:1; grid-row:1; justify-self:end; position:relative; inset:auto; transform:none; margin:0; font-size:13px; max-width:100%; }
