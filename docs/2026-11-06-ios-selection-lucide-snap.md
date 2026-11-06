@@ -25,3 +25,17 @@ Chrome 모바일에서는 실제 브라우저 Touch Events로 쓸기와 500ms �
 `test:regression`은 기존 main과 같은 업무 판정·필드·링크를 비교한다. 요청된 장식 변경에 맞춰 카드뉴스의 `.cn-check`와 `.cn-link a` 앞의 장식 기호만 텍스트 비교에서 분리했다. 입력 스키마와 업무 결과·링크 주소 비교는 유지하며, `src/analysis.js`와 `src/data`는 변경하지 않는다.
 
 현대해상 브랜치에서 `test:scroll`, `test:regression`, `test:companion`, `test:mobile-mascot`, `test:mobile-pointer`, `test:mobile-devtools`, `test:mobile-polish`가 통과했다. 업무 대조 결과는 원본 함수 80개·연결 36개·내장 데이터 2종, 입력/편집 106개, 타임라인 6개 시나리오·판례 8개 상태·약관 3개 분류·KCD 검색 4종·분쟁조정 20개 상태·카드뉴스 7개 양식이 일치했다. 전체/개별 1080px PNG 저장, 편집 저장·초기화, 방문 기록 검사도 통과했다.
+
+| 브랜치 / 구현 커밋 | 빌드 일치 | Chrome·WebKit 전환·선택·아이콘 | 안내·채팅·잡기 | 3개 모바일 크기·7개 카드·걷기 | main 업무·입력 대조 |
+|---|---|---|---|---|---|
+| `v2-hyundai-style` / `d70437f` | 통과 | 통과 | 통과 | 통과 | 통과 |
+| `v2-mascot-guide` / `954ea52` | 통과 | 통과 | 통과 | 통과 | 통과 |
+| `v2-mascot-original` / `f933656` | 통과 | 통과 | 통과 | 통과 | 통과 |
+
+가이드·오리지널의 `src`·`scripts`·패키지 설정·README·docs 차이는 `src/mascot-assets.json`의 선택 경로뿐이다. 두 비교 브랜치에서는 위 4개 런타임 검사와 빌드 확인을 실행했으며, 현대해상 브랜치에서 실행한 별도의 휠·일반 마우스·DevTools 변환 검사까지 다시 실행한 것으로 기재하지 않는다.
+
+## 배포 주소 확인
+
+[현재 사이트](https://wkdal1433.github.io/jangsoni/)와 기존 QR 주소는 유지한다. [배포 실행 42176901093](https://github.com/wkdal1433/jangsoni/actions/runs/42176901093)이 `d70437f79d4c24ac050a88dc033ea93d06bd1f68`을 성공적으로 배포했다.
+
+공개 주소는 HTTP 200으로 응답했고, HTML은 줄바꿈을 통일한 로컬 배포본과 정확히 일치했다. SHA-256은 `59e296bee843f69011ff71e5627ff7c59688ce5316694aec80529fc2eb01e6c6`이다. 공개 QR도 기존 파일과 일치했다. 공개 주소의 Chrome 1440×900에서 한 번의 휠 전환·7개 업무 메뉴·타임라인·뒤로가기를 확인했다. 390×844에서는 소개 두 단계 쓸기·카드 내부 끌기·판례 진입·장손이 500ms 잡기와 글자 선택 방지·뒤로가기를 확인했다. 실제 아이폰 실기기 검증 결과는 아니다.
