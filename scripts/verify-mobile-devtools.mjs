@@ -109,7 +109,7 @@ try {
       assert.ok(walks.every(duration => duration >= 880), 'Repeated input must retain the fixed walking duration');
     }
     assert.deepEqual(errors, []);
-    console.log(width + '×' + height + ': Chrome mouse-to-touch conversion, slow card text/title/tags/link drags both ways, pointer capture and non-cancelable touch fallback' + (width === 390 ? ', all seven cards, jitter/horizontal/cancel, rapid re-drag, overflow, taps and feature navigation' : ''));
+    console.log(width + '×' + height + ': Chrome mouse-to-touch conversion, slow card drags both ways, pointer capture and non-cancelable legacy touch moves' + (width === 390 ? ', text/title/tags/link, all seven cards, jitter/horizontal/cancel, rapid re-drag, overflow, taps and feature navigation' : ', text/link'));
     await page.close();
   }
 } finally {
