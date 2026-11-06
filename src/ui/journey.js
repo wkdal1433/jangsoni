@@ -5,6 +5,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  const counter=root.querySelector('#journey-counter');
  const bar=root.querySelector('#journey-progress-bar');
  const stage=root.querySelector('.journey-sticky');
+ const board=root.querySelector('.journey-board');
  const scrollTrack=root.querySelector('.journey-scroll-track');
  const snapPoints=steps.map(()=>{
    const point=document.createElement('div');
@@ -28,6 +29,7 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  let lastMobileScroll=window.scrollY;
  let mobileEntryTimer=0, mobileEntryPending=false, mobileTouching=false;
  let mobileSwipe=null;
+ let ignoreMobileClick=false;
  let revealTimer=0;
  let cardReaction;
 
@@ -224,42 +226,72 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
    return direction>0?targets.find(target=>target.top>scrollTop+2):targets.findLast(target=>target.top<scrollTop-2);
  }
 
- function onMobileTouchStart(event){
-   mobileTouching=true;
-   cancelMobileEntry();
-   mobileSwipe=null;
-   if(desktopJourney.matches||root.hidden||tour.hidden||reduce.matches||!mascot.ready||event.touches.length!==1) return;
-   if(document.activeElement.matches('input,select,textarea,[contenteditable]')||document.querySelector('dialog[open]')) return;
-   if(event.target.closest?.('input,select,textarea,[contenteditable],#companion-chat,#case-companion')) return;
-   if(event.target.closest?.('button,a')&&!event.target.closest('.journey-card')) return;
-   const touch=event.touches[0];
-   mobileSwipe={x:touch.clientX,y:touch.clientY,top:window.scrollY,locked:!!journeyFrame};
- }
-
- function onMobileTouchMove(event){
-   if(!mobileSwipe||event.touches.length!==1||!event.cancelable) return;
-   if(mobileSwipe.locked||journeyFrame){event.preventDefault();return;}
-   const touch=event.touches[0];
-   const delta=mobileSwipe.y-touch.clientY;
-   if(Math.abs(delta)<18||Math.abs(delta)<=Math.abs(mobileSwipe.x-touch.clientX)) return;
-   mobileSwipe.destination=mobileDestination(Math.sign(delta),mobileSwipe.top);
-   if(mobileSwipe.destination) event.preventDefault();
- }
-
- function onMobileTouchEnd(){
-   mobileTouching=false;
+ function cancelMobileSwipe(){
    const swipe=mobileSwipe;
    mobileSwipe=null;
+   delete board.dataset.swiping;
+   if(swipe?.captured&&board.hasPointerCapture(swipe.pointer)) board.releasePointerCapture(swipe.pointer);
+ }
+
+ function startMobileSwipe(x,y,target,pointer=null){
+   cancelMobileEntry();
+   cancelMobileSwipe();
+   if(desktopJourney.matches||root.hidden||tour.hidden||!mascot.ready) return;
+   if(reduce.matches&&pointer===null) return;
+   if(document.activeElement.matches('input,select,textarea,[contenteditable]')||document.querySelector('dialog[open]')) return;
+   if(target.closest?.('input,select,textarea,[contenteditable],#companion-chat,#case-companion')) return;
+   if(target.closest?.('button,a')&&!target.closest('.journey-card')) return;
+   mobileSwipe={pointer,x,y,top:window.scrollY,locked:!!journeyFrame,captured:false};
+ }
+
+ function chooseMobileSwipe(x,y){
+   const delta=mobileSwipe.y-y;
+   if(Math.abs(delta)<18||Math.abs(delta)<=Math.abs(mobileSwipe.x-x)){
+     mobileSwipe.destination=null;
+     return false;
+   }
+   if(!mobileSwipe.locked&&!journeyFrame) mobileSwipe.destination=mobileDestination(Math.sign(delta),mobileSwipe.top);
+   return mobileSwipe.locked||!!journeyFrame||!!mobileSwipe.destination;
+ }
+
+ function onMobilePointerDown(event){
+   ignoreMobileClick=false;
+   if(event.pointerType==='touch'||!event.isPrimary||event.button!==0||!event.target.closest?.('.journey-board')) return;
+   startMobileSwipe(event.clientX,event.clientY,event.target,event.pointerId);
+ }
+
+ function onMobilePointerMove(event){
+   if(mobileSwipe?.pointer!==event.pointerId) return;
+   if(event.pointerType==='mouse'&&event.buttons===0){cancelMobileSwipe();return;}
+   if(!chooseMobileSwipe(event.clientX,event.clientY)) return;
+   if(!mobileSwipe.captured){
+     board.setPointerCapture(event.pointerId);
+     mobileSwipe.captured=true;
+     board.dataset.swiping='';
+   }
+   if(event.cancelable) event.preventDefault();
+ }
+
+ function finishMobileSwipe(){
+   const swipe=mobileSwipe;
+   ignoreMobileClick=swipe.captured;
+   cancelMobileSwipe();
    if(swipe?.destination&&!swipe.locked&&!journeyFrame){
      cancelMobileEntry();
      cardReaction?.cancel();
      const {top,index}=swipe.destination;
-     if(swipe.destination.section===afterJourney&&top>swipe.top) handoff(avatar,boundaryDuration);
-     moveJourney(top,index,index!==null);
-   }else if(mobileEntryPending){
-     clearTimeout(mobileEntryTimer);
-     mobileEntryTimer=setTimeout(finishMobileEntry,120);
+     if(reduce.matches){
+       window.scrollTo({top,behavior:'instant'});
+       if(index!==null) setActive(index);
+     }else{
+       if(swipe.destination.section===afterJourney&&top>swipe.top) handoff(avatar,boundaryDuration);
+       moveJourney(top,index,index!==null);
+     }
    }
+ }
+
+ function onMobilePointerUp(event){
+   if(mobileSwipe?.pointer===event.pointerId) finishMobileSwipe();
  }
 
  function onJourneyWheel(event){
@@ -332,25 +364,46 @@ export function setupJourney(root, tour, reduce, mascot, handoff) {
  }));
  window.addEventListener('wheel',onJourneyWheel,{passive:false});
  window.addEventListener('wheel',event=>{if(!desktopJourney.matches&&event.deltaY<0) cancelMobileEntry();},{passive:true});
- window.addEventListener('touchstart',onMobileTouchStart,{passive:true});
- window.addEventListener('touchmove',onMobileTouchMove,{passive:false});
- window.addEventListener('touchend',onMobileTouchEnd,{passive:true});
- window.addEventListener('touchcancel',()=>{mobileTouching=false;mobileSwipe=null;cancelMobileEntry();},{passive:true});
+ window.addEventListener('pointerdown',onMobilePointerDown);
+ window.addEventListener('pointermove',onMobilePointerMove,{passive:false});
+ window.addEventListener('pointerup',onMobilePointerUp);
+ window.addEventListener('pointercancel',event=>{if(mobileSwipe?.pointer===event.pointerId) cancelMobileSwipe();});
+ board.addEventListener('lostpointercapture',event=>{if(event.target===board&&mobileSwipe?.pointer===event.pointerId) cancelMobileSwipe();});
+ window.addEventListener('blur',()=>{cancelMobileSwipe();cancelMobileEntry();mobileTouching=false;});
+ window.addEventListener('touchstart',event=>{
+   mobileTouching=true;
+   if(event.touches.length!==1){cancelMobileSwipe();cancelMobileEntry();return;}
+   const touch=event.touches[0];
+   startMobileSwipe(touch.clientX,touch.clientY,event.target);
+ },{passive:true});
+ window.addEventListener('touchmove',event=>{
+   if(!mobileSwipe||mobileSwipe.pointer!==null||event.touches.length!==1||!event.cancelable) return;
+   const touch=event.touches[0];
+   if(mobileSwipe.locked||journeyFrame||chooseMobileSwipe(touch.clientX,touch.clientY)) event.preventDefault();
+ },{passive:false});
+ window.addEventListener('touchend',event=>{
+   mobileTouching=event.touches.length>0;
+   if(!mobileTouching&&mobileSwipe?.pointer===null) finishMobileSwipe();
+   if(!mobileTouching&&mobileEntryPending){clearTimeout(mobileEntryTimer);mobileEntryTimer=setTimeout(finishMobileEntry,120);}
+ },{passive:true});
+ window.addEventListener('touchcancel',()=>{mobileTouching=false;cancelMobileSwipe();cancelMobileEntry();},{passive:true});
  document.addEventListener('click',event=>{
-   if(event.target.closest?.('[data-scroll-target],[data-preview-go],[data-go]')) stopJourneyTransition();
+   if(ignoreMobileClick&&event.detail>0){ignoreMobileClick=false;event.preventDefault();event.stopPropagation();return;}
+   if(event.target.closest?.('[data-scroll-target],[data-preview-go],[data-go]')){cancelMobileSwipe();stopJourneyTransition();}
  },true);
  document.addEventListener('focusin',event=>{
-   if(event.target.matches('input,select,textarea,[contenteditable]')) stopJourneyTransition();
+   if(event.target.matches('input,select,textarea,[contenteditable]')){cancelMobileSwipe();stopJourneyTransition();}
  });
- window.addEventListener('popstate',stopJourneyTransition);
+ window.addEventListener('popstate',()=>{cancelMobileSwipe();stopJourneyTransition();});
  window.addEventListener('scroll',requestUpdate,{passive:true});
  window.addEventListener('resize',()=>{
    cardReaction?.cancel();
+   cancelMobileSwipe();
    if(journeyFrame||mobileWalkFrame) stopJourneyTransition();
    requestUpdate();
    syncDetails();
    positionSpeech();
  });
- reduce.addEventListener('change',()=>{if(reduce.matches){cardReaction?.cancel();stopJourneyTransition();}});
+ reduce.addEventListener('change',()=>{if(reduce.matches){cardReaction?.cancel();cancelMobileSwipe();stopJourneyTransition();}});
  requestUpdate();
 }
